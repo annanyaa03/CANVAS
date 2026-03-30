@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery — CANVAS</title>
+<meta name="description" content="Walk through a 3D cinematic gallery of creative work on CANVAS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/global.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+body{overflow-x:hidden}
+.gallery-bg{position:fixed;inset:0;z-index:0;animation:bgShift 15s ease-in-out infinite alternate}
+@keyframes bgShift{
+  0%{background:linear-gradient(135deg,var(--bg-primary),var(--bg-secondary),var(--bg-tertiary))}
+  50%{background:linear-gradient(135deg,var(--bg-secondary),var(--bg-tertiary),var(--bg-primary))}
+  100%{background:linear-gradient(135deg,var(--bg-tertiary),var(--bg-primary),var(--bg-secondary))}
+}
+.gallery-page{padding-top:70px;min-height:100vh;position:relative;z-index:1}
+.gallery-header{text-align:center;padding:3.5rem 2rem 2rem}
+.gallery-header h1{font-family: var(--font-primary);font-size:clamp(2rem,5vw,3.5rem);font-weight: 700; margin-bottom:.6rem}
+.gallery-header p{color:var(--text-secondary);font-size:.95rem}
+.nav-hint{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-top:1rem;font-size:.78rem;color:var(--text-muted);flex-wrap:wrap}
+.key{background:var(--accent-soft);border:1px solid var(--border-strong);color:var(--accent-primary-dark);border-radius:6px;padding:.15rem .55rem;font-family: var(--font-primary);font-size:.75rem}
+/* Room */
+.gallery-room{position:relative;width:100%;overflow:hidden;perspective:1400px;min-height:65vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+.gallery-stage{position:relative;width:100%;max-width:1100px;display:flex;align-items:center;justify-content:center}
+.gallery-wall{position:absolute;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:2.5rem;transition:all .75s cubic-bezier(.4,0,.2,1);flex-wrap:wrap}
+.wall-hidden-left{transform:translateX(-110%) rotateY(15deg);opacity:0;pointer-events:none}
+.wall-active{transform:translateX(0) rotateY(0);opacity:1;position:relative}
+.wall-hidden-right{transform:translateX(110%) rotateY(-15deg);opacity:0;pointer-events:none}
+/* Frame */
+.art-frame{cursor:none;transition:all .35s cubic-bezier(.4,0,.2,1);position:relative;flex-shrink:0}
+.art-frame:hover{transform:translateY(-10px) scale(1.04)}
+.frame-mat{border-radius:4px;padding:10px;background:var(--bg-primary);box-shadow:var(--shadow-soft)}
+.art-frame:hover .frame-mat{box-shadow:var(--shadow-strong)}
+.art-visual{border-radius:2px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative}
+.frame-label{text-align:center;margin-top:.6rem}
+.frame-title{font-family: var(--font-primary);font-weight: 600; font-size:.85rem;display:block}
+.frame-sub{font-size:.72rem;color:var(--text-muted);display:block;margin-top:.15rem}
+.frame-tag{position:absolute;top:.5rem;right:.5rem;background:rgba(255,255,255,0.7);backdrop-filter:blur(8px);border:1px solid var(--border-default);color:var(--text-primary);border-radius:100px;padding:.15rem .55rem;font-size:.68rem;font-weight:600}
+/* Nav */
+.gallery-nav{display:flex;align-items:center;justify-content:center;gap:1rem;padding:1.5rem;position:relative;z-index:5}
+.g-arrow{width:50px;height:50px;border-radius:50%;background:var(--glass-bg);border:1px solid var(--border-default);color:var(--text-primary);font-size:1.3rem;display:flex;align-items:center;justify-content:center;cursor:none;transition:var(--transition)}
+.g-arrow:hover{background:var(--accent-secondary-light);border-color:var(--accent-secondary);color:var(--accent-secondary-dark);transform:scale(1.1)}
+.g-arrow:active{transform:scale(.94)}
+.g-dots{display:flex;gap:.5rem;align-items:center}
+.g-dot{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,0.08);cursor:none;transition:var(--transition)}
+.g-dot.on{width:22px;border-radius:4px;background:var(--gradient-primary)}
+/* Modal */
+.case-modal{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,0.7);backdrop-filter:blur(14px);padding:1rem}
+.case-modal.open{display:flex;animation:fadeIn .3s ease}
+.case-box{background:var(--bg-primary);border:1px solid var(--glass-border);box-shadow:var(--shadow-strong);border-radius:22px;width:100%;max-width:750px;max-height:90vh;overflow-y:auto;animation:slideInRight .45s cubic-bezier(.4,0,.2,1);position:relative}
+@keyframes slideInRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+.case-hero{height:260px;border-radius:22px 22px 0 0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:5rem;position:relative}
+.case-body{padding:2.25rem}
+.case-close{position:absolute;top:1rem;right:1rem;background:var(--glass-bg);border:1px solid var(--border-default);color:var(--text-primary);width:36px;height:36px;border-radius:50%;font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:none;transition:var(--transition);z-index:2}
+.case-close:hover{background:var(--accent-soft);border-color:var(--accent-primary);color:var(--accent-primary-dark)}
+.case-title{font-family: var(--font-primary);font-size:1.7rem;font-weight: 700; margin-bottom:.4rem}
+.case-artist{color:var(--text-secondary);font-size:.9rem;margin-bottom:1.25rem}
+.case-sh{font-family: var(--font-primary);font-size:.85rem;font-weight: 600; color:var(--accent-primary);margin:1.5rem 0 .6rem;display:flex;align-items:center;gap:.5rem;text-transform:uppercase;letter-spacing:.08em}
+.case-sh::after{content:'';flex:1;height:1px;background:var(--border-default)}
+.case-p{color:var(--text-secondary);line-height:1.8;font-size:.9rem;margin-bottom:.75rem}
+.tl{display:flex;flex-direction:column;gap:0;position:relative}
+.tl::before{content:'';position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:var(--gradient-card-1)}
+.tl-row{display:flex;gap:1rem;padding:.5rem 0}
+.tl-dot{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;z-index:1;margin-top:.1rem}
+.tl-ph{font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em}
+.tl-d{font-size:.875rem;color:var(--text-secondary);line-height:1.6}
+.out-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin:.75rem 0}
+.out-stat{background:var(--bg-secondary);border:1px solid var(--border-default);border-radius:12px;padding:1rem;text-align:center}
+.out-val{font-family: var(--font-primary);font-size:1.5rem;font-weight: 700; display:block;margin-bottom:.2rem;color:var(--text-primary)}
+.out-lbl{font-size:.72rem;color:var(--text-muted)}
+.tools{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0}
+/* Floor */
+.gallery-floor{position:relative;z-index:4;height:2px;background:linear-gradient(90deg,transparent,rgba(167,139,250,0.1),rgba(100,116,139,0.2),transparent);margin:0 3rem}
+footer{position:relative;z-index:5}
+@media(max-width:768px){
+  .gallery-wall{gap:1.25rem}
+  .out-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div class="gallery-bg"></div>
+<nav>
+  <a class="nav-logo" href="index.html">CANVAS</a>
+  <ul class="nav-links">
+    <li><a href="discover.html">Discover</a></li>
+    <li><a href="gallery.html" class="active">Gallery</a></li>
+    <li><a href="workspace.html">Workspace</a></li>
+    <li><a href="ai-studio.html">AI Studio</a></li>
+    <li><a href="skills.html">Skills</a></li>
+    <li><a href="client.html">Client Portal</a></li>
+    <li><a href="profile.html">Profile</a></li>
+  </ul>
+  <a class="nav-cta" href="discover.html">Join CANVAS</a>
+  <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu">
+  <a href="discover.html">Discover</a><a href="gallery.html" class="active">Gallery</a>
+  <a href="workspace.html">Workspace</a><a href="ai-studio.html">AI Studio</a>
+  <a href="skills.html">Skills</a><a href="client.html">Client Portal</a><a href="profile.html">Profile</a>
+</div>
+
+<div class="gallery-page">
+  <div class="gallery-header">
+    <span class="section-label">3D Gallery Experience</span>
+    <h1>The <span class="gradient-text">Creative Gallery</span></h1>
+    <p>A curated exhibition of world-class creative work. Click any frame to read the full case study.</p>
+    <div class="nav-hint">
+      <span><span class="key">←</span><span class="key">→</span> Navigate rooms</span>
+      <span>Click frame to open case study</span>
+    </div>
+  </div>
+
+  <div class="gallery-room" id="gallery-room">
+    <div class="gallery-stage" id="gallery-stage">
+      <!-- Room 0 -->
+      <div class="gallery-wall wall-active" id="room-0">
+        <div class="art-frame" data-pid="0" style="--gc:rgba(167,139,250,.4)">
+          <div class="frame-mat">
+            <div class="art-visual" style="width:240px;height:300px;background:var(--gradient-card-1)">
+              <span><i data-lucide="palette"></i></span><span class="frame-tag">Featured</span>
+            </div>
+          </div>
+          <div class="frame-label"><span class="frame-title">Fintech Rebrand 2025</span><span class="frame-sub">Maya Chen · UI/UX Design</span></div>
+        </div>
+        <div class="art-frame" data-pid="1" style="--gc:rgba(100,116,139,.4)">
+          <div class="frame-mat">
+            <div class="art-visual" style="width:200px;height:255px;background:var(--gradient-card-2)"><i data-lucide="zap"></i></div>
+          </div>
+          <div class="frame-label"><span class="frame-title">Design System OS</span><span class="frame-sub">Arjun Patel · Development</span></div>
+        </div>
+        <div class="art-frame" data-pid="2" style="--gc:rgba(30,41,59,.4)">
+          <div class="frame-mat">
+            <div class="art-visual" style="width:225px;height:280px;background:var(--gradient-card-3)">
+              <span><i data-lucide="stars"></i></span><span class="frame-tag"><i data-lucide="flame" style="width:12px;height:12px;display:inline"></i> Trending</span>
+            </div>
+          </div>
+          <div class="frame-label"><span class="frame-title">Galaxy World-Build</span><span class="frame-sub">Sofia Reyes · 3D Art</span></div>
+        </div>
+      </div>
+      <!-- Room 1 -->
+      <div class="gallery-wall wall-hidden-right" id="room-1">
+        <div class="art-frame" data-pid="3" style="--gc:rgba(167,139,250,.4)">
+          <div class="frame-mat">
+            <div class="art-visual" style="width:215px;height:268px;background:var(--gradient-card-1)"><i data-lucide="pen-tool"></i></div>
+          </div>
+          <div class="frame-label"><span class="frame-title">App Copy Overhaul</span><span class="frame-sub">James Liu · UX Writing</span></div>
+        </div>
+        <div class="art-frame" data-pid="4" style="--gc:rgba(100,116,139,.4)">
+          <div class="frame-mat">
+            <div class="art-visual" style="width:255px;height:315px;background:var(--gradient-card-2)">
+              <span><i data-lucide="clapperboard"></i></span><span class="frame-tag"><i data-lucide="trophy" style="width:12px;height:12px;display:inline"></i> Award</span>
+            </div>
+          </div>
+          <div class="frame-label"><span class="frame-title">Netflix Opener Spots</span><span class="frame-sub">Nina Okafor · Motion</span></div>
+        </div>
+        <div class="art-frame" data-pid="5" style="--gc:rgba(30,41,59,.35)">
+          <div class="frame-mat">
+            <div class="art-visual" style="width:205px;height:255px;background:var(--gradient-card-3)"><i data-lucide="leaf"></i></div>
+          </div>
+          <div class="frame-label"><span class="frame-title">Eco Brand Identity</span><span class="frame-sub">Priya Sharma · Branding</span></div>
+        </div>
+      </div>
+      <!-- Room 2 -->
+      <div class="gallery-wall wall-hidden-right" id="room-2">
+        <div class="art-frame" data-pid="6" style="--gc:rgba(167,139,250,.4)">
+          <div class="frame-mat">
+            <div class="art-visual" style="width:235px;height:290px;background:var(--gradient-card-1)">
+              <span><i data-lucide="waves"></i></span><span class="frame-tag">New</span>
+            </div>
+          </div>
+          <div class="frame-label"><span class="frame-title">WebGL Ocean Sim</span><span class="frame-sub">Alex Morgan · Creative Dev</span></div>
+        </div>
+        <div class="art-frame" data-pid="7" style="--gc:rgba(100,116,139,.35)">
+          <div class="frame-mat">
+            <div class="art-visual" style="width:220px;height:275px;background:var(--gradient-card-2)"><i data-lucide="newspaper"></i></div>
+          </div>
+          <div class="frame-label"><span class="frame-title">Bloomberg Cover</span><span class="frame-sub">Emma Wilson · Illustration</span></div>
+        </div>
+        <div class="art-frame" data-pid="8" style="--gc:rgba(30,41,59,.35)">
+          <div class="frame-mat">
+            <div class="art-visual" style="width:230px;height:285px;background:var(--gradient-card-3)"><i data-lucide="smartphone"></i></div>
+          </div>
+          <div class="frame-label"><span class="frame-title">SaaS Dashboard 3.0</span><span class="frame-sub">Carlos Vega · Product Design</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gallery-floor"></div>
+
+  <div class="gallery-nav">
+    <button class="g-arrow" id="prev-room">←</button>
+    <div class="g-dots" id="g-dots">
+      <div class="g-dot on" data-i="0"></div>
+      <div class="g-dot" data-i="1"></div>
+      <div class="g-dot" data-i="2"></div>
+    </div>
+    <button class="g-arrow" id="next-room">→</button>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand"><a class="nav-logo" href="index.html">CANVAS</a><p>The creative portfolio OS. Your work, elevated.</p></div>
+        <div class="footer-col"><h4>Platform</h4><ul><li><a href="discover.html">Discover</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="workspace.html">Workspace</a></li></ul></div>
+        <div class="footer-col"><h4>Tools</h4><ul><li><a href="ai-studio.html">AI Studio</a></li><li><a href="skills.html">Skills</a></li><li><a href="client.html">Client Portal</a></li></ul></div>
+        <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Privacy</a></li></ul></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-tagline">Your work, elevated.</span><span class="footer-copy">© 2026 CANVAS.</span></div>
+    </div>
+  </footer>
+</div>
+
+<div class="ticker-wrap"><div class="ticker-track"></div></div>
+
+<!-- CASE STUDY MODAL -->
+<div class="case-modal" id="case-modal">
+  <div class="case-box">
+    <button class="case-close" id="case-close">×</button>
+    <div class="case-hero" id="case-hero"></div>
+    <div class="case-body" id="case-body"></div>
+  </div>
+</div>
+
+<script src="js/global.js"></script>
+<script src="js/gallery.js"></script>
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>
