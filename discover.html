@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discover — CANVAS</title>
+  <meta name="description"
+    content="Discover thousands of world-class creative portfolios. Find designers, developers, writers, and artists in the CANVAS community.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/global.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .discover-hero {
+      padding: 8rem 2rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .discover-hero h1 {
+      font-family: var(--font-primary);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    /* ─── FILTER BAR ─── */
+    .filter-bar {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1.25rem;
+      border-radius: 100px;
+      border: 1px solid var(--border-default);
+      background: var(--glass-bg);
+      color: var(--text-secondary);
+      font-family: var(--font-primary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: none;
+      transition: var(--transition);
+    }
+
+    .filter-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary)
+    }
+
+    .filter-btn.active {
+      background: var(--accent-primary);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .filter-btn.active:hover {
+      background: var(--accent-secondary)
+    }
+
+    /* ─── SEARCH ─── */
+    .search-wrap {
+      margin-left: auto;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .search-wrap input {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-strong);
+      border-radius: 100px;
+      color: var(--text-primary);
+      font-family: var(--font-primary);
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem 0.5rem 2.5rem;
+      width: 180px;
+      outline: none;
+      cursor: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .search-wrap input:focus,
+    .search-wrap.expanded input {
+      width: 260px;
+      border-color: var(--accent-primary);
+      background: var(--bg-secondary);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+
+    /* ─── DISCOVER LAYOUT ─── */
+    .discover-layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem 6rem;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 2.5rem;
+      align-items: start;
+    }
+
+    /* ─── MASONRY ─── */
+    .masonry-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: 10px;
+      gap: 1.5rem;
+    }
+
+    /* ─── PORTFOLIO CARD ─── */
+    .portfolio-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: var(--glass-blur);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      cursor: none;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      min-height: 420px;
+      /* Prevent line collapse */
+      display: flex;
+      flex-direction: column;
+    }
+
+    .portfolio-card:hover {
+      transform: translateY(-8px) scale(1.01);
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-strong);
+    }
+
+    .card-banner {
+      height: 180px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .card-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--glass-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .portfolio-card:hover .card-overlay {
+      opacity: 1
+    }
+
+    .view-gallery-btn {
+      background: var(--accent-primary);
+      color: #fff;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: var(--radius-btn);
+      font-family: var(--font-primary);
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: none;
+      transform: translateY(10px);
+      transition: var(--transition);
+    }
+
+    .portfolio-card:hover .view-gallery-btn {
+      transform: translateY(0)
+    }
+
+    .view-gallery-btn:hover {
+      background: var(--accent-secondary);
+      transform: translateY(-2px) !important;
+      box-shadow: var(--shadow-soft)
+    }
+
+    .card-body {
+      padding: 1.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem
+    }
+
+    .card-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-primary);
+      font-weight: 700;
+      font-size: 1rem;
+      color: #fff;
+      flex-shrink: 0;
+      border: 2px solid var(--bg-primary);
+    }
+
+    .card-name {
+      font-family: var(--font-primary);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-primary)
+    }
+
+    .card-discipline {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em
+    }
+
+    .card-project {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+      flex-grow: 1;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-default);
+    }
+
+    .card-stats {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .card-stats span {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem
+    }
+
+    .like-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: 100px;
+      color: var(--text-secondary);
+      padding: 0.3rem 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: none;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .like-btn:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary-dark);
+      background: var(--accent-soft)
+    }
+
+    /* ─── SIDEBAR ─── */
+    .discover-sidebar {
+      position: sticky;
+      top: 90px
+    }
+
+    .sidebar-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: var(--glass-blur);
+      border-radius: var(--radius-card);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .sidebar-card h3 {
+      font-family: var(--font-primary);
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .trending-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-default);
+      cursor: none;
+      transition: var(--transition);
+    }
+
+    .trending-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0
+    }
+
+    .trending-item:hover .trending-name {
+      color: var(--accent-primary)
+    }
+
+    .trending-rank {
+      font-family: var(--font-primary);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      width: 20px;
+      flex-shrink: 0;
+    }
+
+    .trending-info {
+      flex: 1;
+      min-width: 0
+    }
+
+    .trending-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: color 0.3s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .trending-disc {
+      font-size: 0.75rem;
+      color: var(--text-muted)
+    }
+
+    .trending-views {
+      font-size: 0.75rem;
+      color: var(--accent-primary-dark);
+      font-family: var(--font-primary);
+      flex-shrink: 0;
+    }
+
+    .follow-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      padding: 0.25rem 0.7rem;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: none;
+      transition: var(--transition);
+    }
+
+    .follow-btn:hover {
+      border-color: var(--accent-secondary);
+      color: var(--accent-secondary-dark)
+    }
+
+    .follow-btn.following {
+      background: var(--accent-secondary-light);
+      border-color: var(--accent-secondary);
+      color: var(--accent-secondary-dark);
+    }
+
+    /* ─── BANNER PATTERNS ─── */
+    .banner-1 {
+      background: var(--gradient-card-1)
+    }
+
+    .banner-2 {
+      background: var(--gradient-card-2)
+    }
+
+    .banner-3 {
+      background: var(--gradient-card-3)
+    }
+
+    .banner-4 {
+      background: var(--gradient-card-1)
+    }
+
+    .banner-5 {
+      background: var(--gradient-card-2)
+    }
+
+    .banner-6 {
+      background: var(--gradient-card-3)
+    }
+
+    .banner-7 {
+      background: var(--gradient-card-1)
+    }
+
+    .banner-8 {
+      background: var(--gradient-card-2)
+    }
+
+    .banner-9 {
+      background: var(--gradient-card-3)
+    }
+
+    .banner-10 {
+      background: var(--gradient-card-1)
+    }
+
+    .banner-11 {
+      background: var(--gradient-card-2)
+    }
+
+    .banner-12 {
+      background: var(--gradient-card-3)
+    }
+
+    @media(max-width:900px) {
+      .discover-layout {
+        grid-template-columns: 1fr
+      }
+
+      .discover-sidebar {
+        position: static
+      }
+
+      .masonry-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:600px) {
+      .filter-bar {
+        gap: 0.5rem
+      }
+
+      .search-wrap input {
+        width: 140px
+      }
+
+      .search-wrap.expanded input,
+      .search-wrap input:focus {
+        width: 200px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+
+  <nav>
+    <a class="nav-logo" href="index.html">CANVAS</a>
+    <ul class="nav-links">
+      <li><a href="discover.html" class="active">Discover</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="workspace.html">Workspace</a></li>
+      <li><a href="ai-studio.html">AI Studio</a></li>
+      <li><a href="skills.html">Skills</a></li>
+      <li><a href="client.html">Client Portal</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+    <a class="nav-cta" href="discover.html">Join CANVAS</a>
+    <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </nav>
+  <div class="mobile-menu">
+    <a href="discover.html" class="active">Discover</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="workspace.html">Workspace</a>
+    <a href="ai-studio.html">AI Studio</a>
+    <a href="skills.html">Skills</a>
+    <a href="client.html">Client Portal</a>
+    <a href="profile.html">Profile</a>
+    <a href="discover.html" class="nav-cta" style="text-align:center">Join CANVAS</a>
+  </div>
+
+  <div class="discover-hero">
+    <div>
+      <span class="section-label">Community</span>
+      <h1>Discover <span class="gradient-text">Creative Work</span></h1>
+      <p style="color:var(--text-secondary);margin-top:0.75rem;font-size:1.05rem">Explore 12,400+ portfolios from the
+        world's most talented creatives.</p>
+    </div>
+    <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+      <span class="badge badge-live">Live Feed</span>
+      <span style="color:var(--text-muted);font-size:0.85rem;font-family: var(--font-primary)">12,400 creators</span>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="designer">Designers</button>
+    <button class="filter-btn" data-filter="developer">Developers</button>
+    <button class="filter-btn" data-filter="writer">Writers</button>
+    <button class="filter-btn" data-filter="artist">Artists</button>
+    <div class="search-wrap">
+      <span class="search-icon"><i data-lucide="search" style="width:16px;height:16px"></i></span>
+      <input type="text" id="search-input" placeholder="Search creatives…">
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="discover-layout">
+    <div class="masonry-grid" id="masonry-grid">
+
+      <!-- Card 1: Designer -->
+      <div class="portfolio-card" data-category="designer">
+        <div class="card-banner" style="background:linear-gradient(135deg, #0f172a, #334155); height:220px">
+          <div class="card-overlay"><button class="view-gallery-btn">View Gallery</button></div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <div class="card-avatar" style="background:var(--gradient-card-1)">MC</div>
+            <div>
+              <div class="card-name">Maya Chen</div>
+              <div class="card-discipline">UI/UX Designer</div>
+            </div>
+            <button class="follow-btn" style="margin-left:auto">Follow</button>
+          </div>
+          <p class="card-project">Redesigning the future of fintech through accessible, human-centric interfaces and
+            seamless onboarding flows.</p>
+          <div class="card-footer">
+            <div class="card-stats"><span>👁 8.4k</span><span>📁 14 projects</span></div>
+            <button class="like-btn">♥ <span class="like-count">512</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Developer -->
+      <div class="portfolio-card" data-category="developer">
+        <div class="card-banner" style="background:linear-gradient(135deg, #a78bfa, #8b5cf6); height:190px">
+          <div class="card-overlay"><button class="view-gallery-btn">View Gallery</button></div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <div class="card-avatar" style="background:var(--gradient-card-2)">AP</div>
+            <div>
+              <div class="card-name">Arjun Patel</div>
+              <div class="card-discipline">Full-Stack Developer</div>
+            </div>
+            <button class="follow-btn" style="margin-left:auto">Follow</button>
+          </div>
+          <p class="card-project">Bridging the gap between design and code with high-performance React systems and WebGL
+            experiences.</p>
+          <div class="card-footer">
+            <div class="card-stats"><span>👁 12k</span><span>📁 9 projects</span></div>
+            <button class="like-btn">♥ <span class="like-count">840</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Artist -->
+      <div class="portfolio-card" data-category="artist">
+        <div class="card-banner" style="background:linear-gradient(135deg, #64748b, #94a3b8); height:240px">
+          <div class="card-overlay"><button class="view-gallery-btn">View Gallery</button></div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <div class="card-avatar" style="background:var(--gradient-card-3)">SR</div>
+            <div>
+              <div class="card-name">Sofia Reyes</div>
+              <div class="card-discipline">Digital Artist</div>
+            </div>
+            <button class="follow-btn" style="margin-left:auto">Follow</button>
+          </div>
+          <p class="card-project">Exploring the intersection of surrealism and digital sculpture. Specialized in 3D
+            concept world-building.</p>
+          <div class="card-footer">
+            <div class="card-stats"><span>👁 24k</span><span>📁 21 projects</span></div>
+            <button class="like-btn">♥ <span class="like-count">1.4k</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Writer -->
+      <div class="portfolio-card" data-category="writer">
+        <div class="card-banner" style="background:linear-gradient(135deg, #1e293b, #475569); height:180px">
+          <div class="card-overlay"><button class="view-gallery-btn">View Gallery</button></div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <div class="card-avatar" style="background:var(--gradient-card-1)">JL</div>
+            <div>
+              <div class="card-name">James Liu</div>
+              <div class="card-discipline">UX Writer</div>
+            </div>
+            <button class="follow-btn" style="margin-left:auto">Follow</button>
+          </div>
+          <p class="card-project">Crafting narratives that guide users. Former editorial lead for world-class tech
+            publications.</p>
+          <div class="card-footer">
+            <div class="card-stats"><span>👁 6.2k</span><span>📁 11 projects</span></div>
+            <button class="like-btn">♥ <span class="like-count">318</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5: Designer -->
+      <div class="portfolio-card" data-category="designer">
+        <div class="card-banner" style="background:linear-gradient(135deg, #c4b5fd, #a78bfa); height:200px">
+          <div class="card-overlay"><button class="view-gallery-btn">View Gallery</button></div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <div class="card-avatar" style="background:var(--gradient-card-2)">PS</div>
+            <div>
+              <div class="card-name">Priya Sharma</div>
+              <div class="card-discipline">Brand Designer</div>
+            </div>
+            <button class="follow-btn" style="margin-left:auto">Follow</button>
+          </div>
+          <p class="card-project">Building visual identities for the next generation of silicon valley startups.
+            Minimalist and bold.</p>
+          <div class="card-footer">
+            <div class="card-stats"><span>👁 15k</span><span>📁 18 projects</span></div>
+            <button class="like-btn">♥ <span class="like-count">920</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6: Developer -->
+      <div class="portfolio-card" data-category="developer">
+        <div class="card-banner" style="background:linear-gradient(135deg, #f1f5f9, #cbd5e1); height:230px">
+          <div class="card-overlay"><button class="view-gallery-btn">View Gallery</button></div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <div class="card-avatar" style="background:var(--gradient-card-3)">AM</div>
+            <div>
+              <div class="card-name">Alex Morgan</div>
+              <div class="card-discipline">Creative Developer</div>
+            </div>
+            <button class="follow-btn" style="margin-left:auto">Follow</button>
+          </div>
+          <p class="card-project">Pushing the boundaries of the canvas with shaders, physics engines, and generative art
+            installations.</p>
+          <div class="card-footer">
+            <div class="card-stats"><span>👁 19k</span><span>📁 15 projects</span></div>
+            <button class="like-btn">♥ <span class="like-count">1.1k</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 7: Artist -->
+      <div class="portfolio-card" data-category="artist">
+        <div class="card-banner" style="background:linear-gradient(135deg, #0f172a, #1e293b); height:210px">
+          <div class="card-overlay"><button class="view-gallery-btn">View Gallery</button></div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <div class="card-avatar" style="background:var(--gradient-card-1)">NO</div>
+            <div>
+              <div class="card-name">Nina Okafor</div>
+              <div class="card-discipline">Motion Designer</div>
+            </div>
+            <button class="follow-btn" style="margin-left:auto">Follow</button>
+          </div>
+          <p class="card-project">Award-winning motion graphics for global campaigns. Bringing static designs to life
+            through rhythm.</p>
+          <div class="card-footer">
+            <div class="card-stats"><span>👁 34k</span><span>📁 22 projects</span></div>
+            <button class="like-btn">♥ <span class="like-count">2.3k</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 8: Developer -->
+      <div class="portfolio-card" data-category="developer">
+        <div class="card-banner" style="background:linear-gradient(135deg, #334155, #64748b); height:195px">
+          <div class="card-overlay"><button class="view-gallery-btn">View Gallery</button></div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <div class="card-avatar" style="background:var(--gradient-card-2)">LT</div>
+            <div>
+              <div class="card-name">Liam Torres</div>
+              <div class="card-discipline">Frontend Engineer</div>
+            </div>
+            <button class="follow-btn" style="margin-left:auto">Follow</button>
+          </div>
+          <p class="card-project">Expert in building accessible, high-performance web applications with a focus on
+            buttery smooth interactions.</p>
+          <div class="card-footer">
+            <div class="card-stats"><span>👁 9.1k</span><span>📁 13 projects</span></div>
+            <button class="like-btn">♥ <span class="like-count">612</span></button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /masonry-grid -->
+
+    <!-- SIDEBAR -->
+    <aside class="discover-sidebar">
+      <div class="sidebar-card">
+        <h3>🔥 Trending This Week</h3>
+        <div class="trending-item">
+          <span class="trending-rank">#1</span>
+          <div class="trending-info">
+            <div class="trending-name">Nina Okafor</div>
+            <div class="trending-disc">Motion Designer</div>
+          </div>
+          <span class="trending-views">34k</span>
+          <button class="follow-btn">Follow</button>
+        </div>
+        <div class="trending-item">
+          <span class="trending-rank">#2</span>
+          <div class="trending-info">
+            <div class="trending-name">Emma Wilson</div>
+            <div class="trending-disc">Illustrator</div>
+          </div>
+          <span class="trending-views">28k</span>
+          <button class="follow-btn">Follow</button>
+        </div>
+        <div class="trending-item">
+          <span class="trending-rank">#3</span>
+          <div class="trending-info">
+            <div class="trending-name">Alex Morgan</div>
+            <div class="trending-disc">Creative Dev</div>
+          </div>
+          <span class="trending-views">18k</span>
+          <button class="follow-btn">Follow</button>
+        </div>
+        <div class="trending-item">
+          <span class="trending-rank">#4</span>
+          <div class="trending-info">
+            <div class="trending-name">Aria Nakamura</div>
+            <div class="trending-disc">Interaction Designer</div>
+          </div>
+          <span class="trending-views">14k</span>
+          <button class="follow-btn">Follow</button>
+        </div>
+        <div class="trending-item">
+          <span class="trending-rank">#5</span>
+          <div class="trending-info">
+            <div class="trending-name">Priya Sharma</div>
+            <div class="trending-disc">Brand Designer</div>
+          </div>
+          <span class="trending-views">11k</span>
+          <button class="follow-btn">Follow</button>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>📊 Community Stats</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div
+            style="text-align:center;padding:0.75rem;background:var(--bg-primary);border-radius:12px;border:1px solid var(--border-default)">
+            <div
+              style="font-family: var(--font-primary); font-weight: 700; font-size:1.3rem;color:var(--accent-secondary-dark)">
+              12.4k</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">Creators</div>
+          </div>
+          <div
+            style="text-align:center;padding:0.75rem;background:var(--bg-primary);border-radius:12px;border:1px solid var(--border-default)">
+            <div
+              style="font-family: var(--font-primary); font-weight: 700; font-size:1.3rem;color:var(--accent-primary-dark)">
+              850k</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">Projects</div>
+          </div>
+          <div
+            style="text-align:center;padding:0.75rem;background:var(--bg-primary);border-radius:12px;border:1px solid var(--border-default)">
+            <div
+              style="font-family: var(--font-primary); font-weight: 700; font-size:1.3rem;color:var(--accent-secondary-dark)">
+              3.2k</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">Clients</div>
+          </div>
+          <div
+            style="text-align:center;padding:0.75rem;background:var(--bg-primary);border-radius:12px;border:1px solid var(--border-default)">
+            <div
+              style="font-family: var(--font-primary); font-weight: 700; font-size:1.3rem;color:var(--accent-primary-dark)">
+              98%</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">Satisfaction</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>🏷️ Browse by Tag</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
+          <span class="tag tag-purple">UI Design</span>
+          <span class="tag tag-cyan">Development</span>
+          <span class="tag tag-amber">Branding</span>
+          <span class="tag tag-emerald">Motion</span>
+          <span class="tag tag-rose">Illustration</span>
+          <span class="tag tag-purple">3D Art</span>
+          <span class="tag tag-cyan">Web3</span>
+          <span class="tag tag-amber">Typography</span>
+          <span class="tag tag-emerald">Photography</span>
+          <span class="tag tag-rose">Writing</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a class="nav-logo" href="index.html">CANVAS</a>
+          <p>The creative portfolio OS. Your work, elevated.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="discover.html">Discover</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="workspace.html">Workspace</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Tools</h4>
+          <ul>
+            <li><a href="ai-studio.html">AI Studio</a></li>
+            <li><a href="skills.html">Skills</a></li>
+            <li><a href="client.html">Client Portal</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Privacy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-tagline">Your work, elevated.</span>
+        <span class="footer-copy">© 2026 CANVAS. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+  <div class="ticker-wrap">
+    <div class="ticker-track"></div>
+  </div>
+
+  <script src="js/global.js"></script>
+  <script src="js/discover.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+
+</html>
