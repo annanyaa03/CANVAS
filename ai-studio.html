@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Studio — CANVAS</title>
+<meta name="description" content="Generate stunning case studies from your project notes using CANVAS AI Studio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/global.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+/* FLOATING BLOBS */
+.blob{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;animation:blobFloat 12s ease-in-out infinite alternate}
+.blob-1{width:500px;height:500px;background:rgba(167,139,250,0.05);top:-100px;left:-150px;animation-delay:0s}
+.blob-2{width:400px;height:400px;background:rgba(100,116,139,0.05);bottom:100px;right:-100px;animation-delay:-4s}
+.blob-3{width:350px;height:350px;background:rgba(167,139,250,0.03);top:40%;left:50%;transform:translateX(-50%);animation-delay:-8s}
+@keyframes blobFloat{0%{transform:translate(0,0) scale(1)}100%{transform:translate(30px,40px) scale(1.1)}}
+/* LAYOUT */
+.ai-page{position:relative;z-index:1;padding-top:70px;min-height:100vh;padding-bottom:80px;background:var(--bg-primary)}
+.ai-hero{text-align:center;padding:4rem 2rem 2.5rem;max-width:700px;margin:0 auto}
+.ai-hero h1{font-family: var(--font-display);font-size:clamp(2.2rem,5vw,3.5rem);font-weight: 400; margin-bottom:.75rem;color:var(--text-primary)}
+.ai-hero p{color:var(--text-secondary);font-size:1rem;line-height:1.7}
+/* STUDIO BOX */
+.studio{max-width:900px;margin:0 auto;padding:0 2rem 4rem}
+/* TONE SELECTOR */
+.tone-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.tone-btn{
+  padding:.55rem 1.25rem;border-radius:100px;
+  border:1px solid var(--border-default);background:var(--glass-bg);
+  color:var(--text-secondary);font-size:.875rem;font-weight:500;
+  cursor:none;transition:var(--transition);
+}
+.tone-btn:hover{border-color:var(--border-strong);color:var(--text-primary);background:var(--border-default)}
+.tone-btn.active{color:#fff;border-color:transparent}
+.tone-professional.active{background:var(--gradient-primary)}
+.tone-creative.active{background:var(--gradient-secondary)}
+.tone-minimal.active{background:linear-gradient(135deg,var(--accent-secondary-dark),var(--accent-secondary-light))}
+.tone-bold.active{background:var(--gradient-card-3)}
+/* INPUT AREA */
+.input-card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:20px;padding:1.75rem;margin-bottom:1.5rem;backdrop-filter:var(--glass-blur)}
+.input-card label{display:block;font-family: var(--font-display);font-weight: 400; font-size:1rem;margin-bottom:.75rem;color:var(--text-primary)}
+.ai-textarea{
+  width:100%;min-height:180px;
+  background:var(--bg-secondary);border:1px solid var(--border-strong);
+  border-radius:12px;padding:1rem;
+  color:var(--text-primary);font-family: var(--font-body);font-size:.9rem;line-height:1.7;
+  resize:vertical;outline:none;cursor:none;transition:var(--transition);
+}
+.ai-textarea:focus{border-color:var(--accent-primary);background:var(--bg-primary);box-shadow:var(--shadow-soft)}
+.char-count{font-size:.75rem;color:var(--text-muted);text-align:right;margin-top:.4rem;font-family: var(--font-body)}
+/* GENERATE BTN */
+.gen-btn{
+  width:100%;padding:1rem;border-radius:14px;
+  background:var(--gradient-primary);
+  color:#fff;border:none;font-family: var(--font-body);font-size:1.05rem;font-weight: 500;
+  cursor:none;transition:var(--transition);
+  display:flex;align-items:center;justify-content:center;gap:.75rem;
+  position:relative;overflow:hidden;
+}
+.gen-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent);opacity:0;transition:opacity .3s}
+.gen-btn:hover::before{opacity:1}
+.gen-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-strong)}
+.gen-btn:active{transform:scale(.97)}
+.gen-btn:disabled{opacity:.5;transform:none;cursor:none}
+/* OUTPUT */
+.output-card{
+  background:var(--glass-bg);border:1px solid var(--glass-border);
+  border-radius:20px;padding:1.75rem;
+  display:none;animation:fadeIn .4s ease;
+  backdrop-filter:var(--glass-blur);
+}
+.output-card.visible{display:block}
+.output-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem}
+.output-header h3{font-family: var(--font-display);font-size:1.1rem;font-weight: 400; color:var(--text-primary)}
+.export-btn{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.5rem 1.1rem;border-radius:10px;
+  background:var(--accent-soft);border:1px solid var(--border-strong);
+  color:var(--accent-primary-dark);font-size:.8rem;font-weight:600;cursor:none;transition:var(--transition);
+}
+.export-btn:hover{background:var(--border-default);transform:translateY(-1px)}
+.export-btn.copied{background:var(--border-strong);border-color:var(--accent-primary)}
+.output-text{
+  font-family: var(--font-body);font-size:.9rem;line-height:1.85;
+  color:var(--text-secondary);white-space:pre-wrap;
+  min-height:100px;
+}
+.output-text h2{font-family: var(--font-display);color:var(--text-primary);font-size:1.3rem;margin:1.25rem 0 .5rem}
+.output-text h3{font-family: var(--font-display);color:var(--accent-primary-dark);font-size:1rem;margin:.75rem 0 .35rem}
+.output-text strong{color:var(--text-primary)}
+/* EXAMPLES */
+.examples{margin-top:2rem}
+.examples h3{font-family: var(--font-display);font-weight: 400; font-size:1rem;margin-bottom:1rem;color:var(--text-secondary)}
+.example-chips{display:flex;gap:.75rem;flex-wrap:wrap}
+.chip{
+  padding:.45rem 1rem;border-radius:100px;
+  background:var(--bg-secondary);border:1px solid var(--border-default);
+  font-size:.8rem;color:var(--text-secondary);cursor:none;transition:var(--transition);
+}
+.chip:hover{border-color:var(--accent-primary-light);color:var(--accent-primary-dark);background:var(--accent-soft)}
+/* LOADING */
+.loading-dots{display:flex;gap:6px;align-items:center}
+.loading-dots span{width:8px;height:8px;border-radius:50%;background:var(--accent-primary);animation:dotPop .9s ease-in-out infinite}
+.loading-dots span:nth-child(2){animation-delay:.15s}
+.loading-dots span:nth-child(3){animation-delay:.3s}
+@keyframes dotPop{0%,80%,100%{transform:scale(0);opacity:.4}40%{transform:scale(1);opacity:1}}
+@media(max-width:600px){.tone-row{gap:.5rem}.studio{padding:0 1.25rem 4rem}}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+<nav>
+  <a class="nav-logo" href="index.html">CANVAS</a>
+  <ul class="nav-links">
+    <li><a href="discover.html">Discover</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="workspace.html">Workspace</a></li>
+    <li><a href="ai-studio.html" class="active">AI Studio</a></li>
+    <li><a href="skills.html">Skills</a></li>
+    <li><a href="client.html">Client Portal</a></li>
+    <li><a href="profile.html">Profile</a></li>
+  </ul>
+  <a class="nav-cta" href="discover.html">Join CANVAS</a>
+  <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu">
+  <a href="discover.html">Discover</a><a href="gallery.html">Gallery</a>
+  <a href="workspace.html">Workspace</a><a href="ai-studio.html" class="active">AI Studio</a>
+  <a href="skills.html">Skills</a><a href="client.html">Client Portal</a><a href="profile.html">Profile</a>
+</div>
+
+<div class="ai-page">
+  <div class="ai-hero">
+    <span class="badge badge-new" style="margin-bottom:1.25rem"><i data-lucide="bot" style="width:14px;height:14px"></i> AI-Powered</span>
+    <h1>Turn Notes into <span class="gradient-text">Case Studies</span></h1>
+    <p>Paste your rough project notes below. CANVAS AI will craft a polished, compelling case study in seconds — in the exact tone you choose.</p>
+  </div>
+
+  <div class="studio">
+    <!-- TONE -->
+    <div style="margin-bottom:.5rem">
+      <span style="font-size:.8rem;font-weight:600;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase">Select Tone</span>
+    </div>
+    <div class="tone-row" id="tone-row">
+      <button class="tone-btn tone-professional active" data-tone="professional"><i data-lucide="briefcase"></i> Professional</button>
+      <button class="tone-btn tone-creative" data-tone="creative"><i data-lucide="palette"></i> Creative</button>
+      <button class="tone-btn tone-minimal" data-tone="minimal"><i data-lucide="minus"></i> Minimal</button>
+      <button class="tone-btn tone-bold" data-tone="bold"><i data-lucide="zap"></i> Bold</button>
+    </div>
+
+    <!-- INPUT -->
+    <div class="input-card">
+      <label for="notes-input">Your Project Notes</label>
+      <textarea class="ai-textarea" id="notes-input" placeholder="e.g. I redesigned the onboarding for a fintech app. Users were confused, churn was high. I did research, prototyped 3 versions, tested with 50 users. Final version launched, churn dropped 34%. Used Figma, FigJam, Maze…"></textarea>
+      <div class="char-count"><span id="char-num">0</span> / 2000 chars</div>
+    </div>
+
+    <!-- GENERATE -->
+    <button class="gen-btn" id="gen-btn">
+      <span id="gen-label"><i data-lucide="sparkles"></i> Generate Case Study</span>
+    </button>
+
+    <!-- EXAMPLES -->
+    <div class="examples">
+      <h3>Try an example:</h3>
+      <div class="example-chips">
+        <button class="chip" data-example="fintech">Fintech App Redesign</button>
+        <button class="chip" data-example="brand">Brand Identity Project</button>
+        <button class="chip" data-example="motion">Motion Design Campaign</button>
+        <button class="chip" data-example="dev">Open Source Dev Tool</button>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="output-card" id="output-card" style="margin-top:2rem">
+      <div class="output-header">
+        <h3><i data-lucide="check-circle"></i> Generated Case Study</h3>
+        <button class="export-btn" id="export-btn"><i data-lucide="copy"></i> Copy to Clipboard</button>
+      </div>
+      <div class="output-text" id="output-text"></div>
+    </div>
+  </div>
+
+  <footer style="position:relative;z-index:1">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand"><a class="nav-logo" href="index.html">CANVAS</a><p>The creative portfolio OS. Your work, elevated.</p></div>
+        <div class="footer-col"><h4>Platform</h4><ul><li><a href="discover.html">Discover</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="workspace.html">Workspace</a></li></ul></div>
+        <div class="footer-col"><h4>Tools</h4><ul><li><a href="ai-studio.html">AI Studio</a></li><li><a href="skills.html">Skills</a></li><li><a href="client.html">Client Portal</a></li></ul></div>
+        <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Privacy</a></li></ul></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-tagline">Your work, elevated.</span><span class="footer-copy">© 2026 CANVAS.</span></div>
+    </div>
+  </footer>
+</div>
+<div class="ticker-wrap"><div class="ticker-track"></div></div>
+<script src="js/global.js"></script>
+<script src="js/ai-studio.js"></script>
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portal — CANVAS</title>
+<meta name="description" content="Book a project with a CANVAS creative. View services, testimonials, and availability.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/global.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+.client-page{padding-top:70px;min-height:100vh;padding-bottom:80px}
+/* HERO */
+.client-hero{
+  min-height:55vh;display:flex;align-items:center;
+  position:relative;overflow:hidden;
+  padding:5rem 2rem;
+    background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(167,139,250,0.05),transparent 60%),
+               radial-gradient(ellipse 50% 40% at 90% 80%,rgba(100,116,139,0.05),transparent 50%);
+}
+.client-hero-inner{max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr auto;align-items:center;gap:3rem}
+.client-avatar-lg{
+  width:100px;height:100px;border-radius:50%;
+  background:var(--gradient-card-1);
+  display:flex;align-items:center;justify-content:center;
+  font-family: var(--font-display);font-weight: 400; font-size:2.5rem;color:#fff;
+  border:4px solid var(--border-default);
+  box-shadow:var(--shadow-strong);
+  margin-bottom:1.25rem;flex-shrink:0;
+}
+.client-name{font-family: var(--font-display);font-size:clamp(2rem,5vw,3.5rem);font-weight: 400; line-height:1.1;margin-bottom:.5rem;color:var(--text-primary)}
+.client-title{color:var(--text-secondary);font-size:1.05rem;margin-bottom:1.25rem}
+.avail-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:var(--bg-secondary);border:1px solid var(--border-default);
+  color:var(--text-primary);padding:.4rem 1rem;border-radius:100px;font-size:.82rem;font-weight:600;
+}
+.avail-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-primary);animation:pulse 2s infinite;flex-shrink:0}
+.client-stats-bar{display:flex;gap:2.5rem;margin-top:2rem;flex-wrap:wrap}
+.cs-stat .cs-val{font-family: var(--font-display);font-size:1.6rem;font-weight: 400; display:block}
+.cs-stat .cs-lbl{font-size:.78rem;color:var(--text-muted)}
+/* SERVICES */
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem}
+.service-card{
+  background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);
+  border-radius:var(--radius-card);padding:1.75rem;
+  transition:var(--transition);cursor:none;position:relative;overflow:hidden;
+}
+.service-card::before{content:'';position:absolute;inset:0;border-radius:var(--radius-card);opacity:0;transition:opacity .3s}
+.service-card:hover{transform:translateY(-6px);border-color:var(--border-hover);box-shadow:var(--shadow-soft)}
+.service-card:hover::before{opacity:1}
+.sv1::before{background:var(--gradient-card-1);opacity:0.15;z-index:-1}
+.sv2::before{background:var(--gradient-card-2);opacity:0.15;z-index:-1}
+.sv3::before{background:var(--gradient-card-3);opacity:0.15;z-index:-1}
+.sv4::before{background:var(--gradient-card-1);opacity:0.15;z-index:-1}
+.service-icon{font-size:2rem;margin-bottom:1rem;display:block}
+.service-card h3{font-family: var(--font-display);font-weight: 400; font-size:1.1rem;margin-bottom:.5rem;color:var(--text-primary)}
+.service-card p{color:var(--text-secondary);font-size:.875rem;line-height:1.7;margin-bottom:1rem}
+.service-price{font-family: var(--font-body);font-size:.85rem;color:var(--accent-primary-dark)}
+/* TESTIMONIALS */
+.testimonial-wrap{position:relative;overflow:hidden}
+.testimonial-track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.testimonial-slide{min-width:100%;padding:0 .25rem}
+.testimonial-card{
+  background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);
+  border-radius:20px;padding:2.5rem;
+  position:relative;
+}
+.testimonial-card::before{content:'"';position:absolute;top:1rem;left:1.5rem;font-size:5rem;font-family: var(--font-primary);font-weight: 700; color:var(--border-default);line-height:1}
+.test-text{font-size:1rem;line-height:1.8;color:var(--text-secondary);font-style:italic;margin-bottom:1.5rem;position:relative}
+.test-author{display:flex;align-items:center;gap:.75rem}
+.test-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family: var(--font-display);font-weight: 400; font-size:1rem;color:#fff;flex-shrink:0}
+.test-name{font-weight:700;font-size:.9rem;display:block;color:var(--text-primary)}
+.test-company{font-size:.78rem;color:var(--text-muted)}
+.test-stars{color:var(--accent-amber);font-size:.85rem;margin-bottom:.25rem}
+.test-nav{display:flex;align-items:center;justify-content:center;gap:1rem;margin-top:1.5rem}
+.test-arrow{width:40px;height:40px;border-radius:50%;background:var(--bg-secondary);border:1px solid var(--border-default);color:var(--text-primary);font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:none;transition:var(--transition)}
+.test-arrow:hover{background:var(--accent-soft);border-color:var(--accent-primary);color:var(--accent-primary-dark);}
+.test-dots{display:flex;gap:.4rem}
+.test-dot{width:7px;height:7px;border-radius:50%;background:var(--border-strong);cursor:none;transition:var(--transition)}
+.test-dot.on{background:var(--accent-primary);width:20px;border-radius:3px}
+/* BOOKING FORM */
+.booking-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+.booking-form-wrap{background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);border-radius:20px;padding:2rem}
+.booking-form-wrap h3{font-family: var(--font-display);font-weight: 400; font-size:1.3rem;margin-bottom:.4rem;color:var(--text-primary)}
+.booking-form-wrap p{color:var(--text-secondary);font-size:.875rem;margin-bottom:1.5rem}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+/* SUCCESS STATE */
+.form-success{display:none;text-align:center;padding:2rem 0}
+.form-success.show{display:block;animation:fadeIn .5s ease}
+.success-icon{font-size:3.5rem;margin-bottom:1rem;animation:successPop .6s cubic-bezier(.4,0,.2,1)}
+@keyframes successPop{0%{transform:scale(0) rotate(-15deg)}60%{transform:scale(1.15) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+.success-icon-bg{
+  width:80px;height:80px;border-radius:50%;
+  background:var(--gradient-card-1);
+  border:2px solid var(--accent-primary-light);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1rem;font-size:2rem;
+}
+/* CALENDAR */
+.calendar-wrap{background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);border-radius:20px;padding:2rem}
+.calendar-wrap h3{font-family: var(--font-display);font-weight: 400; font-size:1.3rem;margin-bottom:.4rem;color:var(--text-primary)}
+.calendar-wrap p{color:var(--text-secondary);font-size:.875rem;margin-bottom:1.5rem}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.cal-month{font-family: var(--font-display);font-weight: 400; font-size:1rem;color:var(--text-primary)}
+.cal-arrow{background:none;border:1px solid var(--border-default);color:var(--text-secondary);width:32px;height:32px;border-radius:8px;cursor:none;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.cal-arrow:hover{border-color:var(--accent-primary);color:var(--accent-primary-dark);background:var(--accent-soft)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day-label{text-align:center;font-size:.7rem;font-weight:600;color:var(--text-muted);padding:.25rem 0}
+.cal-day{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;font-size:.78rem;cursor:none;transition:var(--transition);color:var(--text-primary);
+}
+.cal-day.empty{opacity:0}
+.cal-day.open{background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border-default)}
+.cal-day.open:hover{background:var(--accent-soft);transform:scale(1.1);border-color:var(--accent-primary-light);color:var(--accent-primary-dark)}
+.cal-day.booked{background:var(--border-default);color:var(--text-secondary);border:1px solid var(--border-strong);text-decoration:line-through;opacity:.5}
+.cal-day.today{border:2px solid var(--accent-secondary);color:var(--accent-secondary-dark);font-weight:700}
+.cal-legend{display:flex;gap:1.25rem;margin-top:1rem;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--text-muted)}
+.legend-dot{width:10px;height:10px;border-radius:3px}
+@media(max-width:900px){.booking-grid{grid-template-columns:1fr};.client-hero-inner{grid-template-columns:1fr}}
+@media(max-width:600px){.form-row-2{grid-template-columns:1fr};.client-stats-bar{gap:1.5rem}}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<nav>
+  <a class="nav-logo" href="index.html">CANVAS</a>
+  <ul class="nav-links">
+    <li><a href="discover.html">Discover</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="workspace.html">Workspace</a></li>
+    <li><a href="ai-studio.html">AI Studio</a></li>
+    <li><a href="skills.html">Skills</a></li>
+    <li><a href="client.html" class="active">Client Portal</a></li>
+    <li><a href="profile.html">Profile</a></li>
+  </ul>
+  <a class="nav-cta" href="discover.html">Join CANVAS</a>
+  <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu">
+  <a href="discover.html">Discover</a><a href="gallery.html">Gallery</a>
+  <a href="workspace.html">Workspace</a><a href="ai-studio.html">AI Studio</a>
+  <a href="skills.html">Skills</a><a href="client.html" class="active">Client Portal</a><a href="profile.html">Profile</a>
+</div>
+
+<div class="client-page">
+  <!-- HERO -->
+  <div class="client-hero">
+    <div class="client-hero-inner">
+      <div>
+        <div class="client-avatar-lg">A</div>
+        <div class="avail-badge"><div class="avail-dot"></div>Open to Work</div>
+        <h1 class="client-name">Annanya<br><span class="gradient-text">Creative Director</span></h1>
+        <p class="client-title">UI/UX Design · Brand Identity · Creative Strategy</p>
+        <div class="client-stats-bar">
+          <div class="cs-stat"><span class="cs-val gradient-text">40+</span><span class="cs-lbl">Projects</span></div>
+          <div class="cs-stat"><span class="cs-val gradient-text">28</span><span class="cs-lbl">Happy Clients</span></div>
+          <div class="cs-stat"><span class="cs-val gradient-text">5★</span><span class="cs-lbl">Average Rating</span></div>
+          <div class="cs-stat"><span class="cs-val gradient-text">6yrs</span><span class="cs-lbl">Experience</span></div>
+        </div>
+        <div style="display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap">
+          <a href="#booking" class="btn btn-primary">Book a Project</a>
+          <a href="gallery.html" class="btn btn-secondary">View Portfolio</a>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.75rem;padding:1.5rem;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:16px;min-width:220px;backdrop-filter:var(--glass-blur);">
+        <div style="font-size:.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em">Specialties</div>
+        <span class="tag tag-purple">UI/UX Design</span>
+        <span class="tag tag-cyan">Brand Identity</span>
+        <span class="tag tag-amber">Creative Strategy</span>
+        <span class="tag tag-emerald">Product Design</span>
+        <span class="tag tag-rose">Motion Design</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <div class="page-section">
+    <span class="section-label">What I Offer</span>
+    <h2 class="section-title">Services</h2>
+    <p class="section-sub">Premium creative services delivered with precision, care, and a clear process from kickoff to launch.</p>
+    <div class="services-grid">
+      <div class="service-card sv1 reveal">
+        <span class="service-icon"><i data-lucide="palette"></i></span>
+        <h3>UI/UX Design</h3>
+        <p>End-to-end product design — research, wireframes, high-fidelity prototypes, and developer handoff. Figma-first, pixel-perfect.</p>
+        <span class="service-price">From $3,500 / project</span>
+      </div>
+      <div class="service-card sv2 reveal" data-delay="100">
+        <span class="service-icon"><i data-lucide="tag"></i></span>
+        <h3>Brand Identity</h3>
+        <p>Logo, typography, color system, brand book, and ready-to-use templates. Your brand, built to last.</p>
+        <span class="service-price">From $2,800 / project</span>
+      </div>
+      <div class="service-card sv3 reveal" data-delay="200">
+        <span class="service-icon"><i data-lucide="code-2"></i></span>
+        <h3>Creative Development</h3>
+        <p>Webflow, Next.js, and vanilla web builds — beautiful, fast, and accessible. Lighthouse 100 guaranteed.</p>
+        <span class="service-price">From $4,500 / project</span>
+      </div>
+      <div class="service-card sv4 reveal" data-delay="300">
+        <span class="service-icon"><i data-lucide="map"></i></span>
+        <h3>Creative Consulting</h3>
+        <p>Strategic creative direction for in-house teams. Design system audits, brand alignment, team workshops.</p>
+        <span class="service-price">$250 / hour</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <div class="page-section" style="padding-top:0">
+    <span class="section-label">Client Love</span>
+    <h2 class="section-title">What Clients Say</h2>
+    <div class="testimonial-wrap">
+      <div class="testimonial-track" id="test-track">
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <div class="test-stars">★★★★★</div>
+            <p class="test-text">Working with Annanya was unlike anything we'd experienced with a design agency. She understood our vision in the first meeting and delivered something that exceeded every expectation. Our new brand has completely transformed how clients perceive us.</p>
+            <div class="test-author">
+              <div class="test-avatar" style="background:var(--gradient-card-1)">S</div>
+              <div><span class="test-name">Sarah Mitchell</span><span class="test-company">CEO, TechFlow Inc. · San Francisco, CA</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <div class="test-stars">★★★★★</div>
+            <p class="test-text">The UX overhaul Annanya delivered reduced our churn by 34% in just 6 weeks. She doesn't just design — she solves business problems with design. The ROI on this project was extraordinary. We're already planning our next engagement.</p>
+            <div class="test-author">
+              <div class="test-avatar" style="background:var(--gradient-card-2)">R</div>
+              <div><span class="test-name">Raj Menon</span><span class="test-company">CPO, NovaPay · Mumbai, India</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <div class="test-stars">★★★★★</div>
+            <p class="test-text">We hired Annanya to design our brand from scratch. Six months later, that identity has appeared in Forbes, TechCrunch, and on billboards in 3 cities. She's not just a designer — she's a strategic partner in the truest sense of the word.</p>
+            <div class="test-author">
+              <div class="test-avatar" style="background:var(--gradient-card-3)">L</div>
+              <div><span class="test-name">Leila Osei</span><span class="test-company">Founder, GreenRoot · London, UK</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="test-nav">
+        <button class="test-arrow" id="test-prev"><i data-lucide="chevron-left"></i></button>
+        <div class="test-dots">
+          <div class="test-dot on"></div><div class="test-dot"></div><div class="test-dot"></div>
+        </div>
+        <button class="test-arrow" id="test-next"><i data-lucide="chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKING + CALENDAR -->
+  <div class="page-section" style="padding-top:0" id="booking">
+    <span class="section-label">Work Together</span>
+    <h2 class="section-title">Book a Project</h2>
+    <p class="section-sub">Tell me about your project and I'll get back to you within 24 hours.</p>
+    <div class="booking-grid">
+      <div class="booking-form-wrap">
+        <h3>Get in Touch</h3>
+        <p>Fill in the details below and I'll review your brief personally.</p>
+        <form id="booking-form">
+          <div class="form-row-2">
+            <div class="form-group"><label class="form-label">Your Name</label><input class="form-input" id="b-name" type="text" placeholder="Jane Smith" required></div>
+            <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" id="b-email" type="email" placeholder="jane@company.com" required></div>
+          </div>
+          <div class="form-group"><label class="form-label">Project Type</label>
+            <select class="form-select" id="b-type">
+              <option>UI/UX Design</option><option>Brand Identity</option>
+              <option>Creative Development</option><option>Creative Consulting</option><option>Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Budget Range</label>
+            <select class="form-select" id="b-budget">
+              <option>$1,000 – $3,000</option><option>$3,000 – $7,000</option>
+              <option>$7,000 – $15,000</option><option>$15,000+</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Project Brief</label><textarea class="form-textarea" id="b-message" placeholder="Tell me about your project, timeline, and goals…"></textarea></div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center" id="submit-btn"><i data-lucide="send"></i> Send Enquiry</button>
+        </form>
+        <div class="form-success" id="form-success">
+          <div class="success-icon-bg"><i data-lucide="check-circle"></i></div>
+          <h3 style="font-family: var(--font-display);font-weight: 400; font-size:1.3rem;margin-bottom:.5rem;color:var(--text-primary)">Enquiry Received!</h3>
+          <p style="color:var(--text-secondary)">Thank you! I'll review your brief and get back to you within 24 hours.</p>
+          <div style="margin-top:1.5rem;display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+            <a href="gallery.html" class="btn btn-primary btn-sm">View Portfolio</a>
+            <a href="profile.html" class="btn btn-secondary btn-sm">View Profile</a>
+          </div>
+        </div>
+      </div>
+      <div class="calendar-wrap">
+        <h3>Availability</h3>
+        <p>Check when I'm free for new projects this month.</p>
+        <div class="cal-header">
+          <button class="cal-arrow" id="cal-prev"><i data-lucide="chevron-left" style="width:16px;height:16px"></i></button>
+          <span class="cal-month" id="cal-month">April 2026</span>
+          <button class="cal-arrow" id="cal-next"><i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="cal-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--bg-tertiary);border:1px solid var(--accent-primary-light);"></div>Available</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--border-default);border:1px solid var(--border-strong);"></div>Booked</div>
+          <div class="legend-item"><div class="legend-dot" style="border:2px solid var(--accent-secondary)"></div>Today</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand"><a class="nav-logo" href="index.html">CANVAS</a><p>The creative portfolio OS. Your work, elevated.</p></div>
+        <div class="footer-col"><h4>Platform</h4><ul><li><a href="discover.html">Discover</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="workspace.html">Workspace</a></li></ul></div>
+        <div class="footer-col"><h4>Tools</h4><ul><li><a href="ai-studio.html">AI Studio</a></li><li><a href="skills.html">Skills</a></li><li><a href="client.html">Client Portal</a></li></ul></div>
+        <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Privacy</a></li></ul></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-tagline">Your work, elevated.</span><span class="footer-copy">© 2026 CANVAS.</span></div>
+    </div>
+  </footer>
+</div>
+<div class="ticker-wrap"><div class="ticker-track"></div></div>
+<script src="js/global.js"></script>
+<script src="js/client.js"></script>
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>
