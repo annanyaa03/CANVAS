@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile — CANVAS</title>
+<meta name="description" content="View Annanya's creative portfolio profile on CANVAS — projects, skills, and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/global.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+.profile-header{
+  max-width:1100px;margin:0 auto;padding:0 2rem;
+  position:relative;
+}
+.profile-avatar-wrap{
+  position:relative;margin-top:-60px;display:inline-block;margin-bottom:1.25rem;
+}
+.profile-avatar-lg{
+  width:120px;height:120px;border-radius:50%;
+  background:var(--gradient-card-2);
+  display:flex;align-items:center;justify-content:center;
+  font-family: var(--font-display);font-weight: 400; font-size:3rem;color:#fff;
+  border:5px solid var(--bg-primary);
+  box-shadow:var(--shadow-strong);
+}
+.online-dot{
+  position:absolute;bottom:10px;right:6px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--accent-secondary);border:3px solid var(--bg-primary);
+  animation:pulse 2s infinite;
+}
+.profile-info-row{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem;
+}
+.profile-name{font-family: var(--font-display);font-size:2rem;font-weight: 400; line-height:1.1;margin-bottom:.3rem;color:var(--text-primary)}
+.profile-tagline{color:var(--text-secondary);font-size:1rem;margin-bottom:.75rem}
+.profile-location{color:var(--text-muted);font-size:.85rem;display:flex;align-items:center;gap:.3rem}
+.profile-action-btns{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem}
+/* STATS BAR */
+.profile-stats{
+  display:flex;gap:2rem;padding:1.25rem 0;
+  border-top:1px solid var(--border-default);border-bottom:1px solid var(--border-default);
+  margin:1.25rem 0;flex-wrap:wrap;
+}
+.ps-item .ps-val{font-family: var(--font-display);font-size:1.5rem;font-weight: 400; display:block;color:var(--text-primary)}
+.ps-item .ps-lbl{font-size:.78rem;color:var(--text-muted)}
+/* SKILL TAGS ROW */
+.skill-tags-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2rem}
+/* PROFILE LAYOUT */
+.profile-page{padding-bottom:4rem}
+.profile-cover{height:200px;background:var(--gradient-primary);position:relative;overflow:hidden}
+.cover-pattern{position:absolute;inset:0;opacity:.1;background-image:radial-gradient(circle at 2px 2px,var(--text-primary) 1px,transparent 0);background-size:40px 40px}
+.profile-layout{display:grid;grid-template-columns:1fr 300px;gap:2.5rem;max-width:1100px;margin:0 auto;padding:2rem 2rem 0}
+/* PROJECTS GRID */
+.projects-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;margin-bottom:2rem}
+.project-card{
+  background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);
+  border-radius:var(--radius-card);overflow:hidden;
+  cursor:none;transition:var(--transition);
+}
+.project-card:hover{transform:translateY(-6px) scale(1.02);border-color:var(--border-hover);box-shadow:var(--shadow-soft)}
+.project-thumb{height:160px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:3rem}
+.project-thumb-overlay{
+  position:absolute;inset:0;
+  background:var(--glass-bg);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:var(--transition);
+}
+.project-card:hover .project-thumb-overlay{opacity:1}
+.project-body{padding:1rem;background:var(--bg-primary)}
+.project-title{font-family: var(--font-display);font-weight: 400; font-size:.9rem;margin-bottom:.3rem;color:var(--text-primary)}
+.project-meta{font-size:.75rem;color:var(--text-muted);display:flex;justify-content:space-between}
+/* SOCIAL LINKS */
+.social-links{display:flex;gap:.75rem;flex-wrap:wrap;margin:1rem 0}
+.social-btn{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.5rem 1rem;border-radius:100px;
+  background:var(--bg-secondary);border:1px solid var(--border-default);
+  font-size:.78rem;font-weight:500;color:var(--text-secondary);
+  cursor:none;transition:var(--transition);text-decoration:none;
+}
+.social-btn:hover{transform:translateY(-2px);color:var(--text-primary);border-color:var(--border-strong)}
+/* ACTIVITY TIMELINE */
+.timeline-card{background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);border-radius:14px;padding:1.5rem}
+.timeline-card h3{font-family: var(--font-display);font-weight: 400; font-size:1rem;margin-bottom:1.25rem}
+.tl-entry{
+  display:flex;gap:.75rem;padding:.75rem 0;
+  border-bottom:1px solid var(--border-default);position:relative;
+}
+.tl-entry:last-child{border-bottom:none;padding-bottom:0}
+.tl-entry::before{content:'';position:absolute;left:9px;top:100%;width:2px;height:0;background:var(--border-default)}
+.tl-icon{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;margin-top:.15rem;background:var(--accent-soft);color:var(--accent-primary-dark)}
+.tl-content .tl-title{font-size:.825rem;font-weight:500;margin-bottom:.15rem;color:var(--text-secondary)}
+.tl-content .tl-time{font-size:.72rem;color:var(--text-muted);font-family: var(--font-body)}
+/* ABOUT CARD */
+.about-card{background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);border-radius:14px;padding:1.5rem;margin-bottom:1.25rem}
+.about-card h3{font-family: var(--font-display);font-weight: 400; font-size:1rem;margin-bottom:.75rem}
+.about-text{color:var(--text-secondary);font-size:.875rem;line-height:1.8}
+/* FOLLOW BTN */
+.follow-main-btn{
+  padding:.65rem 1.4rem;border-radius:var(--radius-btn);
+  background:var(--accent-soft);border:1px solid var(--accent-primary-light);
+  color:var(--accent-primary-dark);font-family: var(--font-body);font-weight:600;font-size:.875rem;
+  cursor:none;transition:var(--transition);
+}
+.follow-main-btn:hover{background:var(--border-default);transform:translateY(-2px)}
+.follow-main-btn.following{background:var(--accent-primary);color:#fff;border-color:transparent}
+@media(max-width:900px){.profile-layout{grid-template-columns:1fr}.projects-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.projects-grid{grid-template-columns:1fr}.profile-stats{gap:1.25rem}}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<nav>
+  <a class="nav-logo" href="index.html">CANVAS</a>
+  <ul class="nav-links">
+    <li><a href="discover.html">Discover</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="workspace.html">Workspace</a></li>
+    <li><a href="ai-studio.html">AI Studio</a></li>
+    <li><a href="skills.html">Skills</a></li>
+    <li><a href="client.html">Client Portal</a></li>
+    <li><a href="profile.html" class="active">Profile</a></li>
+  </ul>
+  <a class="nav-cta" href="discover.html">Join CANVAS</a>
+  <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu">
+  <a href="discover.html">Discover</a><a href="gallery.html">Gallery</a>
+  <a href="workspace.html">Workspace</a><a href="ai-studio.html">AI Studio</a>
+  <a href="skills.html">Skills</a><a href="client.html">Client Portal</a>
+  <a href="profile.html" class="active">Profile</a>
+</div>
+
+<div class="profile-page">
+  <!-- COVER -->
+  <div class="profile-cover"><div class="cover-pattern"></div></div>
+
+  <!-- HEADER -->
+  <div class="profile-header">
+    <div class="profile-info-row">
+      <div>
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar-lg">A</div>
+          <div class="online-dot"></div>
+        </div>
+        <h1 class="profile-name">Annanya</h1>
+        <p class="profile-tagline">Creative Director · UI/UX Design · Brand · Motion</p>
+        <p class="profile-location"><i data-lucide="map-pin"></i> New Delhi, India · Open to Remote</p>
+        <div class="profile-action-btns">
+          <button class="follow-main-btn" id="follow-main-btn"><i data-lucide="plus"></i> Follow</button>
+          <a href="client.html" class="btn btn-primary btn-sm">Contact</a>
+          <a href="client.html" class="btn btn-secondary btn-sm">Hire Me</a>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.5rem;margin-top:1rem">
+        <span class="badge badge-live">Available for work</span>
+        <span style="font-size:.78rem;color:var(--text-muted);font-family: var(--font-body)">Member since 2024</span>
+      </div>
+    </div>
+
+    <!-- STATS BAR -->
+    <div class="profile-stats stat-block">
+      <div class="ps-item"><span class="ps-val" data-count="40">0</span><span class="ps-lbl">Projects</span></div>
+      <div class="ps-item"><span class="ps-val" data-count="28">0</span><span class="ps-lbl">Clients</span></div>
+      <div class="ps-item"><span class="ps-val" data-count="6">0</span><span class="ps-lbl">Years Active</span></div>
+      <div class="ps-item"><span class="ps-val" data-count="84" data-suffix="k">0</span><span class="ps-lbl">Profile Views</span></div>
+      <div class="ps-item"><span class="ps-val" data-count="1240">0</span><span class="ps-lbl">Followers</span></div>
+    </div>
+
+    <!-- SKILL TAGS -->
+    <div class="skill-tags-row">
+      <span class="tag tag-purple">UI Design</span>
+      <span class="tag tag-cyan">UX Research</span>
+      <span class="tag tag-amber">Brand Identity</span>
+      <span class="tag tag-emerald">Figma</span>
+      <span class="tag tag-rose">Motion Design</span>
+      <span class="tag tag-purple">Design Systems</span>
+      <span class="tag tag-cyan">HTML/CSS</span>
+      <span class="tag tag-amber">Creative Direction</span>
+      <span class="tag tag-emerald">Illustration</span>
+    </div>
+
+    <!-- SOCIAL -->
+    <div class="social-links">
+      <a href="#" class="social-btn tw"><i data-lucide="twitter"></i> Twitter</a>
+      <a href="#" class="social-btn gh"><i data-lucide="github"></i> GitHub</a>
+      <a href="#" class="social-btn li"><i data-lucide="linkedin"></i> LinkedIn</a>
+      <a href="#" class="social-btn dr"><i data-lucide="dribbble"></i> Dribbble</a>
+      <a href="#" class="social-btn"><i data-lucide="globe"></i> Website</a>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="profile-layout">
+    <!-- LEFT: PROJECTS -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+        <h2 style="font-family: var(--font-display);font-size:1.2rem;font-weight:400;color:var(--text-primary)">Featured Projects</h2>
+        <a href="gallery.html" class="btn btn-secondary btn-sm">View Gallery <i data-lucide="arrow-right"></i></a>
+      </div>
+      <div class="projects-grid">
+        <div class="project-card reveal">
+          <div class="project-thumb" style="background:var(--gradient-card-1)"><i data-lucide="palette"></i><div class="project-thumb-overlay"><a href="gallery.html" class="btn btn-primary btn-sm">View <i data-lucide="arrow-right"></i></a></div></div>
+          <div class="project-body"><div class="project-title">Fintech App Redesign</div><div class="project-meta"><span>UI/UX Design</span><span>♥ 248</span></div></div>
+        </div>
+        <div class="project-card reveal" data-delay="80">
+          <div class="project-thumb" style="background:var(--gradient-card-2)"><i data-lucide="zap"></i><div class="project-thumb-overlay"><a href="gallery.html" class="btn btn-primary btn-sm">View <i data-lucide="arrow-right"></i></a></div></div>
+          <div class="project-body"><div class="project-title">Design System OS</div><div class="project-meta"><span>Development</span><span>♥ 512</span></div></div>
+        </div>
+        <div class="project-card reveal" data-delay="160">
+          <div class="project-thumb" style="background:var(--gradient-card-3)"><i data-lucide="stars"></i><div class="project-thumb-overlay"><a href="gallery.html" class="btn btn-primary btn-sm">View <i data-lucide="arrow-right"></i></a></div></div>
+          <div class="project-body"><div class="project-title">Galaxy World-Build</div><div class="project-meta"><span>3D Art</span><span>♥ 1.1k</span></div></div>
+        </div>
+        <div class="project-card reveal" data-delay="240">
+          <div class="project-thumb" style="background:var(--gradient-card-1)"><i data-lucide="leaf"></i><div class="project-thumb-overlay"><a href="gallery.html" class="btn btn-primary btn-sm">View <i data-lucide="arrow-right"></i></a></div></div>
+          <div class="project-body"><div class="project-title">Eco Brand Identity</div><div class="project-meta"><span>Branding</span><span>♥ 672</span></div></div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY TIMELINE -->
+      <div class="timeline-card reveal">
+        <h3 style="color:var(--text-primary)"><i data-lucide="calendar"></i> Recent Activity</h3>
+        <div class="tl-entry">
+          <div class="tl-icon"><i data-lucide="rocket"></i></div>
+          <div class="tl-content"><div class="tl-title"><strong>GreenRoot Identity</strong> featured in Trending</div><div class="tl-time">2 hours ago</div></div>
+        </div>
+        <div class="tl-entry">
+          <div class="tl-icon"><i data-lucide="check"></i></div>
+          <div class="tl-content"><div class="tl-title">Published <strong>Design System v2</strong> to gallery</div><div class="tl-time">Yesterday</div></div>
+        </div>
+        <div class="tl-entry">
+          <div class="tl-icon"><i data-lucide="bar-chart-3"></i></div>
+          <div class="tl-content"><div class="tl-title">Updated Skills — added <strong>Three.js</strong></div><div class="tl-time">3 days ago</div></div>
+        </div>
+        <div class="tl-entry">
+          <div class="tl-icon"><i data-lucide="heart"></i></div>
+          <div class="tl-content"><div class="tl-title"><strong>Fintech Redesign</strong> crossed 1,000 likes</div><div class="tl-time">1 week ago</div></div>
+        </div>
+        <div class="tl-entry">
+          <div class="tl-icon"><i data-lucide="palette"></i></div>
+          <div class="tl-content"><div class="tl-title">New project added: <strong>SaaS Dashboard 3.0</strong></div><div class="tl-time">2 weeks ago</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div>
+      <div class="about-card">
+        <h3 style="color:var(--text-primary)">About</h3>
+        <p class="about-text">Creative Director with 6 years building brands, products, and experiences for startups and enterprises around the world. I believe that great design is invisible — it just feels right.<br><br>Currently open to UI/UX, Brand Identity, and Creative Consulting projects.</p>
+      </div>
+
+      <div class="about-card" style="border-color:var(--border-strong);background:var(--bg-secondary)">
+        <h3 style="color:var(--text-primary)">🏆 Achievements</h3>
+        <div style="display:flex;flex-direction:column;gap:.75rem">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span style="font-size:1.25rem"><i data-lucide="trophy"></i></span>
+            <div><div style="font-size:.85rem;font-weight:600;color:var(--text-primary)">Featured Creator</div><div style="font-size:.75rem;color:var(--text-muted)">Top 1% of CANVAS</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span style="font-size:1.25rem"><i data-lucide="star"></i></span>
+            <div><div style="font-size:.85rem;font-weight:600;color:var(--text-primary)">5-Star Rated</div><div style="font-size:.75rem;color:var(--text-muted)">28 client reviews</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span style="font-size:1.25rem"><i data-lucide="zap"></i></span>
+            <div><div style="font-size:.85rem;font-weight:600;color:var(--text-primary)">Trending × 4</div><div style="font-size:.75rem;color:var(--text-muted)">Community spotlight</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span style="font-size:1.25rem"><i data-lucide="globe"></i></span>
+            <div><div style="font-size:.85rem;font-weight:600;color:var(--text-primary)">Global Reach</div><div style="font-size:.75rem;color:var(--text-muted)">Clients in 12 countries</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-card">
+        <h3 style="color:var(--text-primary)">🔧 Skills Snapshot</h3>
+        <div style="display:flex;flex-direction:column;gap:.6rem">
+          <div><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.3rem"><span style="color:var(--text-secondary)">UI Design</span><span style="color:var(--text-muted)">95%</span></div><div style="height:5px;background:var(--bg-tertiary);border-radius:3px"><div style="width:95%;height:100%;background:var(--gradient-card-1);border-radius:3px"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.3rem"><span style="color:var(--text-secondary)">Figma</span><span style="color:var(--text-muted)">98%</span></div><div style="height:5px;background:var(--bg-tertiary);border-radius:3px"><div style="width:98%;height:100%;background:var(--gradient-card-2);border-radius:3px"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.3rem"><span style="color:var(--text-secondary)">HTML/CSS</span><span style="color:var(--text-muted)">98%</span></div><div style="height:5px;background:var(--bg-tertiary);border-radius:3px"><div style="width:98%;height:100%;background:var(--gradient-card-3);border-radius:3px"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.3rem"><span style="color:var(--text-secondary)">Brand Design</span><span style="color:var(--text-muted)">90%</span></div><div style="height:5px;background:var(--bg-tertiary);border-radius:3px"><div style="width:90%;height:100%;background:var(--gradient-card-1);border-radius:3px"></div></div></div>
+        </div>
+        <a href="skills.html" class="btn btn-secondary btn-sm" style="margin-top:1rem;width:100%;justify-content:center">View Full Skills <i data-lucide="arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <footer style="margin-top:4rem">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand"><a class="nav-logo" href="index.html">CANVAS</a><p>The creative portfolio OS. Your work, elevated.</p></div>
+        <div class="footer-col"><h4>Platform</h4><ul><li><a href="discover.html">Discover</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="workspace.html">Workspace</a></li></ul></div>
+        <div class="footer-col"><h4>Tools</h4><ul><li><a href="ai-studio.html">AI Studio</a></li><li><a href="skills.html">Skills</a></li><li><a href="client.html">Client Portal</a></li></ul></div>
+        <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Privacy</a></li></ul></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-tagline">Your work, elevated.</span><span class="footer-copy">© 2026 CANVAS.</span></div>
+    </div>
+  </footer>
+</div>
+<div class="ticker-wrap"><div class="ticker-track"></div></div>
+<script src="js/global.js"></script>
+<script src="js/profile.js"></script>
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>
