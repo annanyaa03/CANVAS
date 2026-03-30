@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workspace — CANVAS</title>
+<meta name="description" content="Manage your creative projects with CANVAS Workspace — kanban boards, stats, and activity feed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/global.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+.ws-layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh;padding-top:70px}
+/* SIDEBAR */
+.ws-sidebar{
+  background:var(--bg-secondary);
+  border-right:1px solid var(--border-default);
+  padding:2rem 1.25rem;
+  position:sticky;top:70px;height:calc(100vh - 70px);
+  overflow-y:auto;
+  display:flex;flex-direction:column;gap:.35rem;
+}
+.ws-sidebar-title{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin:1rem 0 .4rem .5rem}
+.ws-nav-item{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.6rem .75rem;border-radius:10px;
+  font-size:.875rem;font-weight:500;color:var(--text-secondary);
+  cursor:none;transition:var(--transition);text-decoration:none;
+}
+.ws-nav-item:hover{background:var(--border-default);color:var(--text-primary)}
+.ws-nav-item.active{background:var(--accent-soft);color:var(--accent-primary-dark);border:1px solid var(--accent-primary-light)}
+.ws-nav-item .icon{font-size:1rem;width:20px;text-align:center}
+.ws-avatar{
+  margin-top:auto;padding:1rem .75rem;
+  background:var(--glass-bg);border:1px solid var(--border-default);border-radius:12px;
+  display:flex;align-items:center;gap:.75rem;
+}
+.ws-avatar-circle{width:36px;height:36px;border-radius:50%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;font-family: var(--font-primary);font-weight: 700; font-size:.9rem;color:#fff;flex-shrink:0}
+.ws-avatar-name{font-size:.85rem;font-weight:600;color:var(--text-primary)}
+.ws-avatar-role{font-size:.72rem;color:var(--text-muted)}
+/* MAIN */
+.ws-main{padding:2.5rem;overflow:hidden;background:var(--bg-primary)}
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-bottom:2.5rem}
+.stat-card{
+  background:var(--glass-bg);border:1px solid var(--glass-border);
+  border-radius:var(--radius-card);padding:1.5rem;
+  position:relative;overflow:hidden;
+  transition:var(--transition);
+  backdrop-filter:var(--glass-blur);
+}
+.stat-card:hover{transform:translateY(-3px);border-color:var(--border-hover);box-shadow:var(--shadow-soft)}
+.stat-card::before{content:'';position:absolute;inset:0;opacity:.1;border-radius:var(--radius-card)}
+.sc1::before{background:var(--gradient-card-1)}
+.sc2::before{background:var(--gradient-card-2)}
+.sc3::before{background:var(--gradient-card-3)}
+.sc4::before{background:var(--gradient-primary)}
+.stat-icon{font-size:1.5rem;margin-bottom:.75rem;display:block}
+.stat-num{font-family: var(--font-primary);font-size:2rem;font-weight: 700; display:block;margin-bottom:.2rem;color:var(--text-primary)}
+.stat-lbl{font-size:.8rem;color:var(--text-secondary)}
+.stat-trend{font-size:.72rem;font-family: var(--font-primary);margin-top:.5rem;display:block}
+/* CONTENT GRID */
+.ws-content-grid{display:grid;grid-template-columns:1fr 300px;gap:2rem;align-items:start}
+/* KANBAN */
+.kanban-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.kanban-boards{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.kanban-col{
+  background:var(--bg-secondary);
+  border:1px solid var(--border-default);border-radius:14px;
+  padding:1rem;min-height:400px;
+}
+.col-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.col-title{font-family: var(--font-primary);font-size:.875rem;font-weight: 600; display:flex;align-items:center;gap:.5rem;color:var(--text-primary)}
+.col-count{
+  background:var(--border-default);
+  border-radius:100px;padding:.1rem .5rem;
+  font-size:.72rem;font-family: var(--font-primary);color:var(--text-muted);
+}
+.kanban-card{
+  background:var(--glass-bg);border:1px solid var(--glass-border);
+  border-radius:12px;padding:1rem;margin-bottom:.75rem;
+  cursor:none;transition:var(--transition);
+  position:relative;backdrop-filter:var(--glass-blur);
+}
+.kanban-card:hover{border-color:var(--border-hover);transform:translateY(-2px);box-shadow:var(--shadow-soft)}
+.kanban-card.dragging{opacity:.5;transform:rotate(2deg) scale(.98)}
+.kanban-card.drag-over{border-color:var(--accent-primary);background:var(--accent-soft)}
+.card-color-bar{height:3px;border-radius:2px;margin-bottom:.75rem}
+.card-title{font-size:.875rem;font-weight:600;margin-bottom:.5rem;line-height:1.4;color:var(--text-primary)}
+.card-due{font-size:.72rem;color:var(--text-muted);font-family: var(--font-primary);margin-bottom:.75rem;display:flex;align-items:center;gap:.3rem}
+.progress-bar{height:4px;background:var(--bg-tertiary);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.card-footer-row{display:flex;align-items:center;justify-content:space-between;margin-top:.75rem}
+.card-tag{font-size:.68rem;font-weight:600;padding:.2rem .5rem;border-radius:6px;background:var(--accent-soft);color:var(--accent-primary-dark)}
+.card-assignee{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff}
+/* ADD CARD BTN */
+.add-card-btn{
+  width:100%;padding:.65rem;border-radius:10px;
+  background:var(--bg-primary);border:1px dashed var(--border-strong);
+  color:var(--text-muted);font-size:.8rem;cursor:none;transition:var(--transition);
+  display:flex;align-items:center;justify-content:center;gap:.4rem;
+}
+.add-card-btn:hover{background:var(--accent-soft);border-color:var(--accent-primary-light);color:var(--accent-primary-dark)}
+/* ACTIVITY FEED */
+.activity-feed{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:14px;padding:1.5rem;backdrop-filter:var(--glass-blur)}
+.activity-feed h3{font-family: var(--font-primary);font-weight: 600; font-size:1rem;margin-bottom:1.25rem;color:var(--text-primary)}
+.activity-item{display:flex;gap:.75rem;padding:.75rem 0;border-bottom:1px solid var(--border-default)}
+.activity-item:last-child{border-bottom:none;padding-bottom:0}
+.act-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.act-text{font-size:.825rem;line-height:1.5;color:var(--text-secondary)}
+.act-text strong{color:var(--text-primary)}
+.act-time{font-size:.7rem;color:var(--text-muted);font-family: var(--font-primary);margin-top:.2rem}
+/* ADD PROJECT MODAL */
+.add-modal{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,0.8);backdrop-filter:blur(14px);padding:1rem}
+.add-modal.open{display:flex;animation:fadeIn .3s ease}
+.add-modal-box{background:var(--bg-primary);border:1px solid var(--glass-border);border-radius:20px;width:100%;max-width:520px;padding:2rem;animation:slideUp .4s cubic-bezier(.4,0,.2,1);position:relative;box-shadow:var(--shadow-strong)}
+.add-modal-box h2{font-family: var(--font-primary);font-size:1.4rem;font-weight: 700; margin-bottom:.4rem;color:var(--text-primary)}
+.add-modal-box p{color:var(--text-secondary);font-size:.875rem;margin-bottom:1.75rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:1100px){
+  .kanban-boards{grid-template-columns:repeat(2,1fr)}
+  .ws-content-grid{grid-template-columns:1fr}
+}
+@media(max-width:900px){
+  .ws-layout{grid-template-columns:1fr}
+  .ws-sidebar{display:none}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .ws-main{padding:1.5rem}
+}
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .kanban-boards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<nav>
+  <a class="nav-logo" href="index.html">CANVAS</a>
+  <ul class="nav-links">
+    <li><a href="discover.html">Discover</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="workspace.html" class="active">Workspace</a></li>
+    <li><a href="ai-studio.html">AI Studio</a></li>
+    <li><a href="skills.html">Skills</a></li>
+    <li><a href="client.html">Client Portal</a></li>
+    <li><a href="profile.html">Profile</a></li>
+  </ul>
+  <a class="nav-cta" href="discover.html">Join CANVAS</a>
+  <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu">
+  <a href="discover.html">Discover</a><a href="gallery.html">Gallery</a>
+  <a href="workspace.html" class="active">Workspace</a><a href="ai-studio.html">AI Studio</a>
+  <a href="skills.html">Skills</a><a href="client.html">Client Portal</a><a href="profile.html">Profile</a>
+</div>
+
+<div class="ws-layout">
+  <!-- SIDEBAR -->
+  <aside class="ws-sidebar">
+    <div class="ws-avatar">
+      <div class="ws-avatar-circle">A</div>
+      <div><div class="ws-avatar-name">Annanya</div><div class="ws-avatar-role">Creative Director</div></div>
+    </div>
+    <div class="ws-sidebar-title">Workspace</div>
+    <a href="#" class="ws-nav-item active"><span class="icon"><i data-lucide="layout-dashboard"></i></span>Dashboard</a>
+    <a href="#" class="ws-nav-item"><span class="icon"><i data-lucide="folder"></i></span>Projects</a>
+    <a href="#" class="ws-nav-item"><span class="icon"><i data-lucide="calendar"></i></span>Calendar</a>
+    <a href="#" class="ws-nav-item"><span class="icon"><i data-lucide="message-square"></i></span>Messages</a>
+    <div class="ws-sidebar-title">Studio</div>
+    <a href="ai-studio.html" class="ws-nav-item"><span class="icon"><i data-lucide="bot"></i></span>AI Studio</a>
+    <a href="skills.html" class="ws-nav-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span>Skills</a>
+    <a href="client.html" class="ws-nav-item"><span class="icon"><i data-lucide="briefcase"></i></span>Client Portal</a>
+    <a href="gallery.html" class="ws-nav-item"><span class="icon"><i data-lucide="image"></i></span>Gallery</a>
+    <div class="ws-sidebar-title">Personal</div>
+    <a href="profile.html" class="ws-nav-item"><span class="icon"><i data-lucide="user"></i></span>Profile</a>
+    <a href="#" class="ws-nav-item"><span class="icon"><i data-lucide="settings"></i></span>Settings</a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="ws-main">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem">
+      <div>
+        <h1 style="font-family: var(--font-display);font-size:1.8rem;font-weight:400;margin-bottom:.2rem">Good evening, Annanya 👋</h1>
+        <p style="color:var(--text-secondary);font-size:.9rem">Here's what's happening in your workspace.</p>
+      </div>
+      <button class="btn btn-primary" id="add-project-btn">+ New Project</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row stat-block">
+      <div class="stat-card sc1">
+        <span class="stat-icon"><i data-lucide="folder"></i></span>
+        <span class="stat-num" data-count="12">0</span>
+        <span class="stat-lbl">Active Projects</span>
+        <span class="stat-trend" style="color:var(--text-muted)">↑ 4 this month</span>
+      </div>
+      <div class="stat-card sc2">
+        <span class="stat-icon"><i data-lucide="check-circle"></i></span>
+        <span class="stat-num" data-count="94">0</span>
+        <span class="stat-lbl">Completed Tasks</span>
+        <span class="stat-trend" style="color:var(--text-muted)">↑ 2 this week</span>
+      </div>
+      <div class="stat-card sc3">
+        <span class="stat-icon"><i data-lucide="zap"></i></span>
+        <span class="stat-num" data-count="1480">0</span>
+        <span class="stat-lbl">Community XP</span>
+        <span class="stat-trend" style="color:var(--accent-primary)">Top 2% Globally</span>
+      </div>
+      <div class="stat-card sc4">
+        <span class="stat-icon"><i data-lucide="mail"></i></span>
+        <span class="stat-num" data-count="3">0</span>
+        <span class="stat-lbl">New Messages</span>
+        <span class="stat-trend" style="color:var(--text-muted)">↑ 3 new today</span>
+      </div>
+    </div>
+
+    <!-- KANBAN + ACTIVITY -->
+    <div class="ws-content-grid">
+      <div>
+        <div class="kanban-header">
+          <h2 style="font-family: var(--font-display);font-size:1.2rem;font-weight:400">Projects Board</h2>
+          <div style="display:flex;gap:.5rem">
+            <button class="btn btn-secondary btn-sm">Filter</button>
+            <button class="btn btn-primary btn-sm" id="add-project-btn-2">+ Add</button>
+          </div>
+        </div>
+        <div class="kanban-boards" id="kanban">
+          <!-- IDEAS -->
+          <div class="kanban-col" data-col="ideas">
+            <div class="col-header">
+              <span class="col-title"><span style="color:var(--accent-secondary)">●</span> Ideas</span>
+              <span class="col-count" id="count-ideas">2</span>
+            </div>
+            <div class="kanban-cards" id="col-ideas">
+              <div class="kanban-card" draggable="true" data-id="1">
+                <div class="card-color-bar" style="background:var(--gradient-primary)"></div>
+                <div class="card-title">Personal Brand Refresh</div>
+                <div class="card-due"><i data-lucide="calendar"></i> Apr 15, 2026</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:15%;background:var(--gradient-primary)"></div></div>
+                <div class="card-footer-row">
+                  <span class="card-tag tag-purple">Branding</span>
+                  <div class="card-assignee" style="background:var(--gradient-primary)">A</div>
+                </div>
+              </div>
+              <div class="kanban-card" draggable="true" data-id="2">
+                <div class="card-color-bar" style="background:var(--gradient-secondary)"></div>
+                <div class="card-title">Podcast Visuals Series</div>
+                <div class="card-due"><i data-lucide="calendar"></i> May 2, 2026</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:5%;background:var(--gradient-secondary)"></div></div>
+                <div class="card-footer-row">
+                  <span class="card-tag tag-amber">Design</span>
+                  <div class="card-assignee" style="background:var(--gradient-secondary)">A</div>
+                </div>
+              </div>
+            </div>
+            <button class="add-card-btn">+ Add card</button>
+          </div>
+
+          <!-- IN PROGRESS -->
+          <div class="kanban-col" data-col="progress">
+            <div class="col-header">
+              <span class="col-title"><span style="color:var(--accent-amber)">●</span> In Progress</span>
+              <span class="col-count" id="count-progress">3</span>
+            </div>
+            <div class="kanban-cards" id="col-progress">
+              <div class="kanban-card" draggable="true" data-id="3">
+                <div class="card-color-bar" style="background:var(--gradient-primary)"></div>
+                <div class="card-title">E-commerce UX Overhaul</div>
+                <div class="card-due"><i data-lucide="calendar"></i> Apr 1, 2026</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:72%;background:var(--gradient-primary)"></div></div>
+                <div class="card-footer-row">
+                  <span class="card-tag tag-cyan">UX Design</span>
+                  <div class="card-assignee" style="background:var(--gradient-primary)">A</div>
+                </div>
+              </div>
+              <div class="kanban-card" draggable="true" data-id="4">
+                <div class="card-color-bar" style="background:linear-gradient(90deg,#a78bfa,#8b5cf6)"></div>
+                <div class="card-title">SaaS Landing Page</div>
+                <div class="card-due"><i data-lucide="calendar"></i> Mar 31, 2026</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:55%;background:linear-gradient(90deg,#a78bfa,#8b5cf6)"></div></div>
+                <div class="card-footer-row">
+                  <span class="card-tag tag-rose">Dev</span>
+                  <div class="card-assignee" style="background:linear-gradient(135deg,#a78bfa,#8b5cf6)">A</div>
+                </div>
+              </div>
+              <div class="kanban-card" draggable="true" data-id="5">
+                <div class="card-color-bar" style="background:linear-gradient(90deg,#10b981,#06b6d4)"></div>
+                <div class="card-title">Motion Ident Package</div>
+                <div class="card-due"><i data-lucide="calendar"></i> Apr 8, 2026</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:38%;background:linear-gradient(90deg,#10b981,#06b6d4)"></div></div>
+                <div class="card-footer-row">
+                  <span class="card-tag tag-emerald">Motion</span>
+                  <div class="card-assignee" style="background:linear-gradient(135deg,#10b981,#06b6d4)">A</div>
+                </div>
+              </div>
+            </div>
+            <button class="add-card-btn">+ Add card</button>
+          </div>
+
+          <!-- REVIEW -->
+          <div class="kanban-col" data-col="review">
+            <div class="col-header">
+              <span class="col-title"><span style="color:var(--accent-secondary-light)">●</span> Review</span>
+              <span class="col-count" id="count-review">2</span>
+            </div>
+            <div class="kanban-cards" id="col-review">
+              <div class="kanban-card" draggable="true" data-id="6">
+                <div class="card-color-bar" style="background:linear-gradient(90deg,#64748b,#1e293b)"></div>
+                <div class="card-title">Startup Brand Book</div>
+                <div class="card-due"><i data-lucide="calendar"></i> Mar 30, 2026</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:92%;background:linear-gradient(90deg,#64748b,#1e293b)"></div></div>
+                <div class="card-footer-row">
+                  <span class="card-tag tag-purple">Branding</span>
+                  <div class="card-assignee" style="background:linear-gradient(135deg,#64748b,#1e293b)">A</div>
+                </div>
+              </div>
+              <div class="kanban-card" draggable="true" data-id="7">
+                <div class="card-color-bar" style="background:var(--gradient-secondary)"></div>
+                <div class="card-title">Editorial Illustration Set</div>
+                <div class="card-due"><i data-lucide="calendar"></i> Apr 3, 2026</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:88%;background:var(--gradient-secondary)"></div></div>
+                <div class="card-footer-row">
+                  <span class="card-tag tag-amber">Illustration</span>
+                  <div class="card-assignee" style="background:var(--gradient-secondary)">A</div>
+                </div>
+              </div>
+            </div>
+            <button class="add-card-btn">+ Add card</button>
+          </div>
+
+          <!-- PUBLISHED -->
+          <div class="kanban-col" data-col="published">
+            <div class="col-header">
+              <span class="col-title"><span style="color:var(--accent-secondary-dark)">●</span> Published</span>
+              <span class="col-count" id="count-published">3</span>
+            </div>
+            <div class="kanban-cards" id="col-published">
+              <div class="kanban-card" draggable="true" data-id="8">
+                <div class="card-color-bar" style="background:var(--gradient-primary)"></div>
+                <div class="card-title">Fintech App Redesign</div>
+                <div class="card-due"><i data-lucide="check-circle"></i> Mar 20, 2026</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--gradient-primary)"></div></div>
+                <div class="card-footer-row">
+                  <span class="card-tag tag-emerald">Published</span>
+                   <div class="card-assignee" style="background:var(--gradient-primary)">A</div>
+                </div>
+              </div>
+              <div class="kanban-card" draggable="true" data-id="9">
+                <div class="card-color-bar" style="background:linear-gradient(90deg,#06b6d4,#10b981)"></div>
+                <div class="card-title">Design System v2</div>
+                <div class="card-due"><i data-lucide="check-circle"></i> Mar 12, 2026</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:100%;background:linear-gradient(90deg,#06b6d4,#10b981)"></div></div>
+                <div class="card-footer-row">
+                  <span class="card-tag tag-cyan">Dev</span>
+                  <div class="card-assignee" style="background:linear-gradient(135deg,#06b6d4,#10b981)">A</div>
+                </div>
+              </div>
+              <div class="kanban-card" draggable="true" data-id="10">
+                <div class="card-color-bar" style="background:linear-gradient(90deg,#475569,#64748b)"></div>
+                <div class="card-title">Brand Identity — GreenRoot</div>
+                <div class="card-due"><i data-lucide="check-circle"></i> Mar 5, 2026</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:100%;background:linear-gradient(90deg,#475569,#64748b)"></div></div>
+                <div class="card-footer-row">
+                  <span class="card-tag tag-rose">Branding</span>
+                  <div class="card-assignee" style="background:linear-gradient(135deg,#475569,#64748b)">A</div>
+                </div>
+              </div>
+            </div>
+            <button class="add-card-btn">+ Add card</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY FEED -->
+      <div>
+        <div class="activity-feed">
+          <h3><i data-lucide="zap"></i> Recent Activity</h3>
+          <div class="activity-item">
+            <div class="act-icon" style="background:rgba(167,139,250,.1)"><i data-lucide="palette"></i></div>
+            <div><div class="act-text"><strong>Startup Brand Book</strong> moved to Review</div><div class="act-time">2 hours ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon" style="background:rgba(100,116,139,.1)"><i data-lucide="message-square"></i></div>
+            <div><div class="act-text">New client inquiry from <strong>TechFlow Inc.</strong></div><div class="act-time">4 hours ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon" style="background:rgba(16,185,129,.1)"><i data-lucide="check-circle"></i></div>
+            <div><div class="act-text"><strong>Design System v2</strong> published to gallery</div><div class="act-time">Yesterday</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon" style="background:rgba(167,139,250,.1)"><i data-lucide="eye"></i></div>
+            <div><div class="act-text">Your profile received <strong>847 views</strong> this week</div><div class="act-time">2 days ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon" style="background:rgba(167,139,250,.1)"><i data-lucide="heart"></i></div>
+            <div><div class="act-text"><strong>E-commerce UX</strong> received 34 new likes</div><div class="act-time">3 days ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon" style="background:rgba(167,139,250,.1)"><i data-lucide="rocket"></i></div>
+            <div><div class="act-text"><strong>GreenRoot identity</strong> featured in Trending</div><div class="act-time">4 days ago</div></div>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-top:1.25rem">
+          <h3 style="font-family: var(--font-display);font-weight: 400; font-size:1rem;margin-bottom:1rem"><i data-lucide="link"></i> Quick Links</h3>
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <a href="ai-studio.html" class="ws-nav-item" style="border:1px solid var(--border);border-radius:10px"><span class="icon"><i data-lucide="bot"></i></span> Generate Case Study</a>
+            <a href="gallery.html" class="ws-nav-item" style="border:1px solid var(--border);border-radius:10px"><span class="icon"><i data-lucide="image"></i></span> View My Gallery</a>
+            <a href="client.html" class="ws-nav-item" style="border:1px solid var(--border);border-radius:10px"><span class="icon"><i data-lucide="briefcase"></i></span> Client Portal</a>
+            <a href="skills.html" class="ws-nav-item" style="border:1px solid var(--border);border-radius:10px"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Update Skills</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ADD PROJECT MODAL -->
+<div class="add-modal" id="add-modal">
+  <div class="add-modal-box">
+    <button class="modal-close" id="close-add-modal">×</button>
+    <h2>New Project</h2>
+    <p>Add a new project to your workspace kanban board.</p>
+    <div class="form-group">
+      <label class="form-label">Project Title</label>
+      <input class="form-input" type="text" id="new-title" placeholder="e.g. Brand Identity for Startup X">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="new-category">
+          <option>Design</option><option>Development</option><option>Branding</option>
+          <option>Motion</option><option>Illustration</option><option>Writing</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Due Date</label>
+        <input class="form-input" type="date" id="new-due">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Start Column</label>
+      <select class="form-select" id="new-col">
+        <option value="ideas">Ideas</option>
+        <option value="progress">In Progress</option>
+        <option value="review">Review</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:.5rem" id="create-project-btn">Create Project</button>
+  </div>
+</div>
+
+<div class="ticker-wrap"><div class="ticker-track"></div></div>
+<script src="js/global.js"></script>
+<script src="js/workspace.js"></script>
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>
