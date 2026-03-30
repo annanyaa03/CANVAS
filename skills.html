@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skills — CANVAS</title>
+<meta name="description" content="Visualize and showcase your creative skills with animated charts, radar graphs, and skill tags on CANVAS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/global.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+.skills-page{padding-top:70px;min-height:100vh;padding-bottom:80px}
+.skills-hero{padding:4rem 2rem 2rem;max-width:1200px;margin:0 auto}
+.skills-hero h1{font-family: var(--font-display);font-size:clamp(2.2rem,5vw,3.5rem);font-weight: 400; margin-bottom:.6rem}
+.skills-hero p{color:var(--text-secondary);font-size:1rem}
+/* LAYOUT */
+.skills-grid{display:grid;grid-template-columns:1fr 360px;gap:2rem;max-width:1200px;margin:0 auto;padding:0 2rem 4rem}
+/* BAR CHARTS */
+.chart-card{background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);border-radius:var(--radius-card);padding:1.75rem;margin-bottom:1.5rem}
+.chart-card h3{font-family: var(--font-display);font-weight: 400; font-size:1rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem;color:var(--text-primary)}
+.skill-bar-row{margin-bottom:1rem}
+.skill-bar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+.skill-name{font-size:.875rem;font-weight:500;color:var(--text-secondary)}
+.skill-pct{font-size:.75rem;font-family: var(--font-body);color:var(--text-muted)}
+.bar-track{height:8px;background:var(--bg-tertiary);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+/* RADAR */
+.radar-card{background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);border-radius:var(--radius-card);padding:1.75rem;margin-bottom:1.5rem;text-align:center}
+.radar-card h3{font-family: var(--font-display);font-weight: 400; font-size:1rem;margin-bottom:1.25rem;text-align:left;color:var(--text-primary)}
+canvas#radar{display:block;margin:0 auto}
+/* ADD SKILL */
+.add-skill-card{background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);border-radius:var(--radius-card);padding:1.75rem;margin-bottom:1.5rem}
+.add-skill-card h3{font-family: var(--font-display);font-weight: 400; font-size:1rem;margin-bottom:1rem;color:var(--text-primary)}
+.inline-form{display:flex;gap:.75rem;flex-wrap:wrap}
+.inline-form .form-input{flex:1;min-width:120px}
+.skill-level{width:80px}
+/* TAGS */
+.tags-card{background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);border-radius:var(--radius-card);padding:1.75rem}
+.tags-card h3{font-family: var(--font-display);font-weight: 400; font-size:1rem;margin-bottom:1rem;color:var(--text-primary)}
+.tags-cloud{display:flex;flex-wrap:wrap;gap:.5rem}
+.skill-tag{
+  padding:.35rem .9rem;border-radius:100px;
+  font-size:.78rem;font-weight:600;cursor:none;
+  transition:var(--transition);
+  animation:tagPop .4s cubic-bezier(.4,0,.2,1) both;
+  background:var(--accent-soft);color:var(--accent-primary-dark);border:1px solid var(--border-default);
+}
+.skill-tag:hover{transform:translateY(-2px) scale(1.05);border-color:var(--border-hover)}
+@keyframes tagPop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+/* CATEGORIES SUMMARY */
+.cat-summary{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem}
+.cat-pill{
+  background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);
+  border-radius:12px;padding:1rem;
+  display:flex;align-items:center;gap:.75rem;
+  transition:var(--transition);cursor:none;
+}
+.cat-pill:hover{transform:translateY(-2px);border-color:var(--border-hover);box-shadow:var(--shadow-soft)}
+.cat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cat-info .cat-name{font-size:.85rem;font-weight:600;display:block;color:var(--text-secondary)}
+.cat-info .cat-count{font-size:.72rem;color:var(--text-muted)}
+@media(max-width:900px){
+  .skills-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .cat-summary{grid-template-columns:1fr}
+  .inline-form{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<nav>
+  <a class="nav-logo" href="index.html">CANVAS</a>
+  <ul class="nav-links">
+    <li><a href="discover.html">Discover</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="workspace.html">Workspace</a></li>
+    <li><a href="ai-studio.html">AI Studio</a></li>
+    <li><a href="skills.html" class="active">Skills</a></li>
+    <li><a href="client.html">Client Portal</a></li>
+    <li><a href="profile.html">Profile</a></li>
+  </ul>
+  <a class="nav-cta" href="discover.html">Join CANVAS</a>
+  <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu">
+  <a href="discover.html">Discover</a><a href="gallery.html">Gallery</a>
+  <a href="workspace.html">Workspace</a><a href="ai-studio.html">AI Studio</a>
+  <a href="skills.html" class="active">Skills</a><a href="client.html">Client Portal</a><a href="profile.html">Profile</a>
+</div>
+
+<div class="skills-page">
+  <div class="skills-hero">
+    <span class="section-label">Skills Visualizer</span>
+    <h1>Your <span class="gradient-text">Skill Profile</span></h1>
+    <p>Showcase what you're capable of with animated charts, radar graphs, and interactive skill tags.</p>
+  </div>
+
+  <div class="skills-grid">
+    <div>
+      <!-- DESIGN SKILLS -->
+      <div class="chart-card" id="design-chart">
+        <h3><i data-lucide="palette"></i> Design</h3>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">UI Design</span><span class="skill-pct">95%</span></div><div class="bar-track"><div class="bar-fill" data-pct="95" style="background:var(--gradient-card-1)"></div></div></div>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">UX Research</span><span class="skill-pct">88%</span></div><div class="bar-track"><div class="bar-fill" data-pct="88" style="background:var(--gradient-card-2)"></div></div></div>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">Interaction Design</span><span class="skill-pct">90%</span></div><div class="bar-track"><div class="bar-fill" data-pct="90" style="background:var(--gradient-card-3)"></div></div></div>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">Typography</span><span class="skill-pct">85%</span></div><div class="bar-track"><div class="bar-fill" data-pct="85" style="background:var(--gradient-card-1)"></div></div></div>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">Motion Design</span><span class="skill-pct">78%</span></div><div class="bar-track"><div class="bar-fill" data-pct="78" style="background:var(--gradient-card-2)"></div></div></div>
+      </div>
+
+      <!-- DEVELOPMENT SKILLS -->
+      <div class="chart-card" id="dev-chart">
+        <h3><i data-lucide="zap"></i> Development</h3>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">HTML / CSS</span><span class="skill-pct">98%</span></div><div class="bar-track"><div class="bar-fill" data-pct="98" style="background:var(--gradient-card-3)"></div></div></div>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">JavaScript</span><span class="skill-pct">90%</span></div><div class="bar-track"><div class="bar-fill" data-pct="90" style="background:var(--gradient-card-1)"></div></div></div>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">React / Next.js</span><span class="skill-pct">82%</span></div><div class="bar-track"><div class="bar-fill" data-pct="82" style="background:var(--gradient-card-2)"></div></div></div>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">Three.js / WebGL</span><span class="skill-pct">70%</span></div><div class="bar-track"><div class="bar-fill" data-pct="70" style="background:var(--gradient-card-3)"></div></div></div>
+      </div>
+
+      <!-- TOOLS SKILLS -->
+      <div class="chart-card" id="tools-chart">
+        <h3><i data-lucide="hammer"></i> Tools</h3>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">Figma</span><span class="skill-pct">98%</span></div><div class="bar-track"><div class="bar-fill" data-pct="98" style="background:var(--gradient-card-1)"></div></div></div>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">After Effects</span><span class="skill-pct">80%</span></div><div class="bar-track"><div class="bar-fill" data-pct="80" style="background:var(--gradient-card-2)"></div></div></div>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">Blender</span><span class="skill-pct">72%</span></div><div class="bar-track"><div class="bar-fill" data-pct="72" style="background:var(--gradient-card-3)"></div></div></div>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">Notion / Linear</span><span class="skill-pct">92%</span></div><div class="bar-track"><div class="bar-fill" data-pct="92" style="background:var(--gradient-card-1)"></div></div></div>
+      </div>
+
+      <!-- SOFT SKILLS -->
+      <div class="chart-card" id="soft-chart">
+        <h3><i data-lucide="star"></i> Soft Skills</h3>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">Client Communication</span><span class="skill-pct">94%</span></div><div class="bar-track"><div class="bar-fill" data-pct="94" style="background:var(--gradient-card-2)"></div></div></div>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">Project Management</span><span class="skill-pct">86%</span></div><div class="bar-track"><div class="bar-fill" data-pct="86" style="background:var(--gradient-card-3)"></div></div></div>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">Creative Direction</span><span class="skill-pct">89%</span></div><div class="bar-track"><div class="bar-fill" data-pct="89" style="background:var(--gradient-card-1)"></div></div></div>
+        <div class="skill-bar-row"><div class="skill-bar-top"><span class="skill-name">Mentoring</span><span class="skill-pct">80%</span></div><div class="bar-track"><div class="bar-fill" data-pct="80" style="background:var(--gradient-card-2)"></div></div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div>
+      <!-- CATEGORY SUMMARY -->
+      <div class="cat-summary">
+        <div class="cat-pill"><div class="cat-dot" style="background:var(--accent-primary)"></div><div class="cat-info"><span class="cat-name">Design</span><span class="cat-count">5 skills · avg 87%</span></div></div>
+        <div class="cat-pill"><div class="cat-dot" style="background:var(--accent-secondary)"></div><div class="cat-info"><span class="cat-name">Development</span><span class="cat-count">4 skills · avg 85%</span></div></div>
+        <div class="cat-pill"><div class="cat-dot" style="background:var(--accent-emerald)"></div><div class="cat-info"><span class="cat-name">Tools</span><span class="cat-count">4 skills · avg 86%</span></div></div>
+        <div class="cat-pill"><div class="cat-dot" style="background:var(--accent-secondary-light)"></div><div class="cat-info"><span class="cat-name">Soft Skills</span><span class="cat-count">4 skills · avg 87%</span></div></div>
+      </div>
+
+      <!-- RADAR -->
+      <div class="radar-card">
+        <h3><i data-lucide="radio"></i> Skill Balance Radar</h3>
+        <canvas id="radar" width="300" height="300"></canvas>
+      </div>
+
+      <!-- ADD SKILL -->
+      <div class="add-skill-card">
+        <h3><i data-lucide="plus-circle"></i> Add a Skill</h3>
+        <div class="inline-form">
+          <input class="form-input" type="text" id="skill-name-input" placeholder="Skill name">
+          <input class="form-input skill-level" type="number" id="skill-level-input" min="1" max="100" placeholder="0-100">
+          <select class="form-select" id="skill-cat-input" style="flex:1;min-width:110px">
+            <option>Design</option><option>Development</option><option>Tools</option><option>Soft Skills</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:.75rem" id="add-skill-btn">Add Skill</button>
+      </div>
+
+      <!-- SKILL TAGS -->
+      <div class="tags-card">
+        <h3><i data-lucide="tag"></i> Skill Tags</h3>
+        <div class="tags-cloud" id="tags-cloud"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand"><a class="nav-logo" href="index.html">CANVAS</a><p>The creative portfolio OS. Your work, elevated.</p></div>
+        <div class="footer-col"><h4>Platform</h4><ul><li><a href="discover.html">Discover</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="workspace.html">Workspace</a></li></ul></div>
+        <div class="footer-col"><h4>Tools</h4><ul><li><a href="ai-studio.html">AI Studio</a></li><li><a href="skills.html">Skills</a></li><li><a href="client.html">Client Portal</a></li></ul></div>
+        <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Privacy</a></li></ul></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-tagline">Your work, elevated.</span><span class="footer-copy">© 2026 CANVAS.</span></div>
+    </div>
+  </footer>
+</div>
+<div class="ticker-wrap"><div class="ticker-track"></div></div>
+<script src="js/global.js"></script>
+<script src="js/skills.js"></script>
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>
